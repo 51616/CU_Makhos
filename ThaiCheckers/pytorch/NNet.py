@@ -55,7 +55,7 @@ class NNetWrapper(NeuralNet):
         self.nnet.train()
         self.scheduler.step()
         for epoch in range(args.epochs):
-            examples = np.random.choice(past_examples, len(past_examples)//8)
+            examples = random.sample(past_examples, len(past_examples)//8)
             print('EPOCH ::: ' + str(epoch+1))
 
             data_time = AverageMeter()
@@ -63,7 +63,6 @@ class NNetWrapper(NeuralNet):
             pi_losses = AverageMeter()
             v_losses = AverageMeter()
             end = time.time()
-
 
             bar = Bar('Training Net', max=int(len(examples)/args.batch_size)+1)
             batch_idx = 0
@@ -194,10 +193,10 @@ class NNetWrapper(NeuralNet):
         out = []
 
         for i in range(len(board)):
-            currentplayer_pieces = np.zeros((8,8))
-            currentplayer_kings = np.zeros((8,8))
-            other_pieces = np.zeros((8,8))
-            other_kings = np.zeros((8,8))
+            currentplayer_pieces = np.zeros((8, 8))
+            currentplayer_kings = np.zeros((8, 8))
+            other_pieces = np.zeros((8, 8))
+            other_kings = np.zeros((8, 8))
             currentplayer_pieces[board[i] == 1] = 1
             currentplayer_kings[board[i] == 3] = 1
             other_pieces[board[i] == -1] = 1
@@ -207,8 +206,8 @@ class NNetWrapper(NeuralNet):
             out.append(other_pieces)
             out.append(other_kings)
 
-        turn_plane = np.zeros((8,8))
-        stale_plane = np.zeros((8,8))
+        turn_plane = np.zeros((8, 8))
+        stale_plane = np.zeros((8, 8))
         stale_plane[:, :] = stale
         turn_plane[:, :] = turn
         out.append(stale_plane)

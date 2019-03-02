@@ -36,7 +36,7 @@ def AsyncSelfPlay(net, game, args, iter_num, iterr, bar):
     #     net.load_checkpoint(folder=args.checkpoint, filename='best.pth.tar')
     # except:
     #     pass
-    boardHistory = deque(np.zeros((6,8,8), dtype='int'),maxlen=6)
+    boardHistory = deque(np.zeros((8, 8, 8), dtype='int'), maxlen=8)
     # histIdx = 0
     trainExamples = []
     board = game.getInitBoard()
@@ -64,7 +64,6 @@ def AsyncSelfPlay(net, game, args, iter_num, iterr, bar):
         # if histIdx<7:
         #     histIdx+=1
 
-        
         trainExamples.append([boardHistory, curPlayer, pi,
                               game.gameState.turn, game.gameState.stale, valids])
 
@@ -270,7 +269,10 @@ class Coach():
             print('------ITER ' + str(i) + '------')
             iterationTrainExamples = deque([], maxlen=self.args.maxlenOfQueue)
             temp = self.parallel_self_play()
+
             iterationTrainExamples += temp
+            iterationTrainExamples = list(set(iterationTrainExamples))
+
             self.trainExamplesHistory.append(iterationTrainExamples)
             self.train_network(i)
             self.trainExamplesHistory.clear()
