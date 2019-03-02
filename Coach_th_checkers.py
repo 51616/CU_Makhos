@@ -211,11 +211,11 @@ class Coach():
         #bar = tqdm(total=self.args.numEps)
         for i in range(self.args.numEps):
             # bar.update(1)
-            game_history = pool.apply_async(AsyncSelfPlay, args=(
+            game_history, result = pool.apply_async(AsyncSelfPlay, args=(
                 self.nnet, self.game, self.args, i, self.args.numEps))  # , bar
-            res.append(game_history[0])
+            res.append(game_history)
 
-            if (game_history[1] == 1e-4):
+            if (result == 1e-4):
                 self.draw_count += 1
             else:
                 self.win_loss_count += 1
