@@ -211,7 +211,7 @@ class Coach():
         #bar = Bar('Self Play', max=self.args.numEps)
         for i in tqdm(range(self.args.numEps)):
             res.append(pool.apply_async(AsyncSelfPlay, args=(
-                self.nnet, self.game, self.args, i, self.args.numEps, bar)))
+                self.nnet, self.game, self.args, i, self.args.numEps)))  # , bar
         pool.close()
         pool.join()
         for i in res:
