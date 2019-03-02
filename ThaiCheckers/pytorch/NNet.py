@@ -153,6 +153,7 @@ class NNetWrapper(NeuralNet):
 
             # with torch.no_grad():
             self.nnet.cuda().eval()
+
             batch_idx = 0
             while batch_idx < int(len(val_examples)/args.batch_size)+1:
 
@@ -186,10 +187,10 @@ class NNetWrapper(NeuralNet):
 
                 # compute output
 
-                with torch.no_grad():
-                    out_pi, out_v = self.nnet((boards, valids))
-                    val_pi_loss += self.loss_pi(target_pis, out_pi).item()
-                    val_v_loss += self.loss_v(target_vs, out_v).item()
+                # with torch.no_grad():
+                out_pi, out_v = self.nnet((boards, valids))
+                val_pi_loss += self.loss_pi(target_pis, out_pi).item()
+                val_v_loss += self.loss_v(target_vs, out_v).item()
 
             print('Val Pi loss:', val_pi_loss)
             print('Val V loss:', val_v_loss)
