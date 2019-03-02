@@ -87,13 +87,7 @@ def AsyncSelfPlay(net, game, args, iter_num, iterr):  # , bar
             # print([(x[0], r*x[1])
             #        for x in trainExamples])
             # bar.update(1)
-            global draw_count
-            global win_loss_count
-            if r == 1e-4:
-                draw_count += 1
-            else:
-                win_loss_count += 1
-            return [(x[0], x[2], r*x[1], x[3], x[4], x[5]) for x in trainExamples]
+            return [(x[0], x[2], r*x[1], x[3], x[4], x[5]) for x in trainExamples], r
 
 
 def TrainNetwork(nnet, game, args, iter_num, trainhistory):
@@ -204,6 +198,8 @@ class Coach():
         self.args = args
         self.nnet = nn(game)
         self.trainExamplesHistory = []
+        self.win_loss_count = 0
+        self.draw_count = 0
 
     def parallel_self_play(self):
 
@@ -215,9 +211,14 @@ class Coach():
         #bar = tqdm(total=self.args.numEps)
         for i in range(self.args.numEps):
             # bar.update(1)
-            res.append(pool.apply_async(AsyncSelfPlay, args=(
-                self.nnet, self.game, self.args, i, self.args.numEps)))  # , bar
+            game_history = pool.apply_async(AsyncSelfPlay, args=(
+                self.nnet, self.game, self.args, i, self.args.numEps))  # , bar
+            res.append(game_history[0])
 
+            if (game_history[1] == 1e-4):
+                self.draw_count += 1
+            else:
+                self.win_loss_count += 1
         pool.close()
         pool.join()
         print("Done self-play")

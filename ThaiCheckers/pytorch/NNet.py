@@ -142,58 +142,59 @@ class NNetWrapper(NeuralNet):
             #     )
             #     bar.next()
             # bar.finish()
+            bar.close()
+            print('Training Pi loss:', train_pi_loss,
+                  'Training V loss:', train_v_loss)
+            print()
 
-            print('Training Pi loss:', train_pi_loss)
-            print('Training V loss:', train_v_loss)
+            # val_pi_loss = 0
+            # val_v_loss = 0
+            # # Validation
+            # val_examples = random.sample(past_examples, len(past_examples)//2)
 
-            val_pi_loss = 0
-            val_v_loss = 0
-            # Validation
-            val_examples = random.sample(past_examples, len(past_examples)//2)
+            # # with torch.no_grad():
+            # self.nnet.cuda().eval()
 
-            # with torch.no_grad():
-            self.nnet.cuda().eval()
+            # batch_idx = 0
+            # while batch_idx < int(len(val_examples)/args.batch_size)+1:
 
-            batch_idx = 0
-            while batch_idx < int(len(val_examples)/args.batch_size)+1:
+            #     start = batch_idx*args.batch_size
+            #     if (batch_idx+1)*args.batch_size >= len(val_examples):
+            #         end = -1
+            #     else:
+            #         end = (batch_idx+1)*args.batch_size
 
-                start = batch_idx*args.batch_size
-                if (batch_idx+1)*args.batch_size >= len(val_examples):
-                    end = -1
-                else:
-                    end = (batch_idx+1)*args.batch_size
+            #     if start == len(val_examples)-1:
+            #         boards, pis, vs, turns, stales, valids = list(
+            #             zip(*val_examples[start]))
+            #     else:
+            #         boards, pis, vs, turns, stales, valids = list(
+            #             zip(*val_examples[start:end]))
 
-                if start == len(val_examples)-1:
-                    boards, pis, vs, turns, stales, valids = list(
-                        zip(*val_examples[start]))
-                else:
-                    boards, pis, vs, turns, stales, valids = list(
-                        zip(*val_examples[start:end]))
+            #     stacked_board = []
+            #     for i in range(len(boards)):
+            #         stacked_board.append(self.convertToModelInput(
+            #             boards[i], turns[i], stales[i]))
 
-                stacked_board = []
-                for i in range(len(boards)):
-                    stacked_board.append(self.convertToModelInput(
-                        boards[i], turns[i], stales[i]))
+            #     boards = torch.as_tensor(
+            #         np.array(stacked_board), dtype=torch.float32).cuda()
 
-                boards = torch.as_tensor(
-                    np.array(stacked_board), dtype=torch.float32).cuda()
+            #     target_pis = torch.as_tensor(
+            #         np.array(pis), dtype=torch.float32).cuda()
+            #     target_vs = torch.as_tensor(
+            #         np.array(vs), dtype=torch.float32).cuda()
+            #     valids = torch.as_tensor(
+            #         np.array(valids), dtype=torch.float32).cuda()
 
-                target_pis = torch.as_tensor(
-                    np.array(pis), dtype=torch.float32).cuda()
-                target_vs = torch.as_tensor(
-                    np.array(vs), dtype=torch.float32).cuda()
-                valids = torch.as_tensor(
-                    np.array(valids), dtype=torch.float32).cuda()
+            #     # compute output
 
-                # compute output
+            #     # with torch.no_grad():
+            #     out_pi, out_v = self.nnet((boards, valids))
+            #     val_pi_loss += self.loss_pi(target_pis, out_pi).item()
+            #     val_v_loss += self.loss_v(target_vs, out_v).item()
 
-                # with torch.no_grad():
-                out_pi, out_v = self.nnet((boards, valids))
-                val_pi_loss += self.loss_pi(target_pis, out_pi).item()
-                val_v_loss += self.loss_v(target_vs, out_v).item()
-
-            print('Val Pi loss:', val_pi_loss)
-            print('Val V loss:', val_v_loss)
+            # print('Val Pi loss:', val_pi_loss)
+            # print('Val V loss:', val_v_loss)
 
         self.nnet.cuda().eval()
 
