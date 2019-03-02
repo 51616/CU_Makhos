@@ -271,7 +271,7 @@ class Coach():
             temp = self.parallel_self_play()
 
             iterationTrainExamples += temp
-            iterationTrainExamples = list(set(iterationTrainExamples))
+            #iterationTrainExamples = list(set(iterationTrainExamples))
 
             self.trainExamplesHistory.append(iterationTrainExamples)
             self.train_network(i)
