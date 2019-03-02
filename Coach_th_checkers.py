@@ -19,11 +19,10 @@ win_loss_count = 0
 draw_count = 0
 
 
-def AsyncSelfPlay(net, game, args, iter_num, iterr):  # , bar
+def AsyncSelfPlay(net, game, args, iter_num, iterr, bar):  #
 
     # bar.suffix = "iter:{i}/{x} | Total: {total:} | ETA: {eta:}".format(
     #     i=iter_num+1, x=iterr, total=bar.elapsed_td, eta=bar.eta_td)
-    # bar.next()
 
     # #set gpu
     # if(args.multiGPU):
@@ -87,6 +86,7 @@ def AsyncSelfPlay(net, game, args, iter_num, iterr):  # , bar
             #        for x in trainExamples])
             # print([(x[0], r*x[1])
             #        for x in trainExamples])
+            bar.update(1)
             if r == 1e-4:
                 draw_count += 1
             else:
@@ -209,9 +209,10 @@ class Coach():
         res = []
         result = []
         #bar = Bar('Self Play', max=self.args.numEps)
-        for i in tqdm(range(self.args.numEps)):
+        bar = tqdm(total=self.args.numEps)
+        for i in range(self.args.numEps):
             res.append(pool.apply_async(AsyncSelfPlay, args=(
-                self.nnet, self.game, self.args, i, self.args.numEps)))  # , bar
+                self.nnet, self.game, self.args, i, self.args.numEps, bar)))
         pool.close()
         pool.join()
         for i in res:
