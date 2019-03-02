@@ -137,7 +137,8 @@ def TrainNetwork(nnet, game, args, iter_num, trainhistory):
         # f.closed
     # ------------------
     nnet.train(trainExamples)
-    nnet.save_checkpoint(folder=args.checkpoint, filename='train.pth.tar')
+    nnet.save_checkpoint(folder=args.checkpoint,
+                         filename='train_iter_' + str(iter_num) + '.pth.tar')
 
 
 def AsyncAgainst(game, args, iter_num, bar):
