@@ -55,7 +55,7 @@ class NNetWrapper(NeuralNet):
         self.nnet.train()
         self.scheduler.step()
         for epoch in range(args.epochs):
-            examples = past_examples[np.random.choice(past_examples.shape[0], len(past_examples)/8)]
+            examples = np.random.choice(past_examples, len(past_examples)//8)
             print('EPOCH ::: ' + str(epoch+1))
 
             data_time = AverageMeter()
