@@ -12,14 +12,19 @@ from pickle import Pickler, Unpickler
 from random import shuffle
 from torch import multiprocessing
 import torch
+from tqdm import tqdm
 
 mp = multiprocessing.get_context('spawn')
+win_loss_count = 0
+draw_count = 0
 
 
-def AsyncSelfPlay(net, game, args, iter_num, iterr, bar):
-    bar.suffix = "iter:{i}/{x} | Total: {total:} | ETA: {eta:}".format(
-        i=iter_num+1, x=iterr, total=bar.elapsed_td, eta=bar.eta_td)
-    bar.next()
+def AsyncSelfPlay(net, game, args, iter_num, iterr):  # , bar
+
+    # bar.suffix = "iter:{i}/{x} | Total: {total:} | ETA: {eta:}".format(
+    #     i=iter_num+1, x=iterr, total=bar.elapsed_td, eta=bar.eta_td)
+    # bar.next()
+
     # #set gpu
     # if(args.multiGPU):
     #     if(iter_num%2==0):
@@ -82,6 +87,10 @@ def AsyncSelfPlay(net, game, args, iter_num, iterr, bar):
             #        for x in trainExamples])
             # print([(x[0], r*x[1])
             #        for x in trainExamples])
+            if r == 1e-4:
+                draw_count += 1
+            else:
+                win_loss_count += 1
             return [(x[0], x[2], r*x[1], x[3], x[4], x[5]) for x in trainExamples]
 
 
@@ -199,8 +208,8 @@ class Coach():
         temp = []
         res = []
         result = []
-        bar = Bar('Self Play', max=self.args.numEps)
-        for i in range(self.args.numEps):
+        #bar = Bar('Self Play', max=self.args.numEps)
+        for i in tqdm(range(self.args.numEps)):
             res.append(pool.apply_async(AsyncSelfPlay, args=(
                 self.nnet, self.game, self.args, i, self.args.numEps, bar)))
         pool.close()
@@ -267,11 +276,17 @@ class Coach():
 
         for i in range(1, self.args.numIters+1):
             print('------ITER ' + str(i) + '------')
+            win_loss_count = 0
+            draw_count = 0
+
             iterationTrainExamples = deque([], maxlen=self.args.maxlenOfQueue)
             temp = self.parallel_self_play()
 
             iterationTrainExamples += temp
             #iterationTrainExamples = list(set(iterationTrainExamples))
+
+            print('Win/loss count:', win_loss_count)
+            print('Draw Count:', draw_count)
 
             self.trainExamplesHistory.append(iterationTrainExamples)
             self.train_network(i)

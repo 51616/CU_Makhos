@@ -58,14 +58,18 @@ class NNetWrapper(NeuralNet):
             examples = random.sample(past_examples, len(past_examples)//8)
             print('EPOCH ::: ' + str(epoch+1))
 
-            data_time = AverageMeter()
-            batch_time = AverageMeter()
-            pi_losses = AverageMeter()
-            v_losses = AverageMeter()
-            end = time.time()
+            # data_time = AverageMeter()
+            # batch_time = AverageMeter()
+            # pi_losses = AverageMeter()
+            # v_losses = AverageMeter()
+            # end = time.time()
 
-            bar = Bar('Training Net', max=int(len(examples)/args.batch_size)+1)
+            # bar = Bar('Training Net', max=int(len(examples)/args.batch_size)+1)
+            bar = tqdm(total=int(len(examples)/args.batch_size))
             batch_idx = 0
+
+            train_pi_loss = 0
+            train_v_loss = 0
 
             while batch_idx < int(len(examples)/args.batch_size)+1:
                 start = batch_idx*args.batch_size
@@ -105,9 +109,12 @@ class NNetWrapper(NeuralNet):
                 l_v = self.loss_v(target_vs, out_v)
                 total_loss = l_pi + l_v
 
+                train_pi_loss += l_pi
+                train_v_loss += l_v
+
                 # record loss
-                pi_losses.update(l_pi.item(), boards.size(0))
-                v_losses.update(l_v.item(), boards.size(0))
+                # pi_losses.update(l_pi.item(), boards.size(0))
+                # v_losses.update(l_v.item(), boards.size(0))
 
                 # compute gradient and do SGD step
                 self.optimizer.zero_grad()
@@ -115,23 +122,74 @@ class NNetWrapper(NeuralNet):
                 self.optimizer.step()
 
                 # measure elapsed time
-                batch_time.update(time.time() - end)
-                end = time.time()
+                # batch_time.update(time.time() - end)
+                # end = time.time()
+
                 batch_idx += 1
 
                 # plot progress
-                bar.suffix = '({batch}/{size}) Data: {data:.3f}s | Batch: {bt:.3f}s | Total: {total:} | ETA: {eta:} | Loss_pi: {lpi:.4f} | Loss_v: {lv:.3f}'.format(
-                    batch=batch_idx,
-                    size=int(len(examples)/args.batch_size)+1,
-                    data=data_time.avg,
-                    bt=batch_time.avg,
-                    total=bar.elapsed_td,
-                    eta=bar.eta_td,
-                    lpi=pi_losses.avg,
-                    lv=v_losses.avg,
-                )
-                bar.next()
-            bar.finish()
+                bar.update(1)
+            #     bar.suffix = '({batch}/{size}) Data: {data:.3f}s | Batch: {bt:.3f}s | Total: {total:} | ETA: {eta:} | Loss_pi: {lpi:.4f} | Loss_v: {lv:.3f}'.format(
+            #         batch=batch_idx,
+            #         size=int(len(examples)/args.batch_size)+1,
+            #         data=data_time.avg,
+            #         bt=batch_time.avg,
+            #         total=bar.elapsed_td,
+            #         eta=bar.eta_td,
+            #         lpi=pi_losses.avg,
+            #         lv=v_losses.avg,
+            #     )
+            #     bar.next()
+            # bar.finish()
+
+            print('Training Pi loss:', train_pi_loss)
+            print('Training V loss:', train_v_loss)
+
+            val_pi_loss = 0
+            val_v_loss = 0
+            # Validation
+            val_examples = random.sample(past_examples, len(past_examples)//2)
+            with torch.no_grad():
+                batch_idx = 0
+                while batch_idx < int(len(val_examples)/args.batch_size)+1:
+
+                    start = batch_idx*args.batch_size
+                    if (batch_idx+1)*args.batch_size >= len(val_examples):
+                        end = -1
+                    else:
+                        end = (batch_idx+1)*args.batch_size
+
+                    if start == len(val_examples)-1:
+                        boards, pis, vs, turns, stales, valids = list(
+                            zip(*val_examples[start]))
+                    else:
+                        boards, pis, vs, turns, stales, valids = list(
+                            zip(*val_examples[start:end]))
+
+                    stacked_board = []
+                    for i in range(len(boards)):
+                        stacked_board.append(self.convertToModelInput(
+                            boards[i], turns[i], stales[i]))
+
+                    boards = torch.as_tensor(
+                        np.array(stacked_board), dtype=torch.float32).cuda()
+
+                    target_pis = torch.as_tensor(
+                        np.array(pis), dtype=torch.float32).cuda()
+                    target_vs = torch.as_tensor(
+                        np.array(vs), dtype=torch.float32).cuda()
+                    valids = torch.as_tensor(
+                        np.array(valids), dtype=torch.float32).cuda()
+
+                    # compute output
+                    out_pi, out_v = self.nnet((boards, valids))
+
+                    val_pi_loss += self.loss_pi(target_pis, out_pi)
+                    val_v_loss = self.loss_v(target_vs, out_v)
+
+            print('Val Pi loss:', val_pi_loss)
+            print('Val V loss:', val_v_loss)
+
         self.nnet.eval()
 
     def predict(self, board, turn, stale, valids):
