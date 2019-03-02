@@ -295,11 +295,9 @@ class Coach():
         for i in range(1, self.args.numIters+1):
             print('------ITER ' + str(i) + '------')
 
-            global draw_count
-            global win_loss_count
-
-            draw_count = 0
-            win_loss_count = 0
+            self.win_count = 0
+            self.loss_count = 0
+            self.draw_count = 0
 
             iterationTrainExamples = deque([], maxlen=self.args.maxlenOfQueue)
             temp = self.parallel_self_play()

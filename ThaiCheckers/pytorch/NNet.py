@@ -75,13 +75,14 @@ class NNetWrapper(NeuralNet):
             while batch_idx < int(len(examples)/args.batch_size)+1:
                 start = batch_idx*args.batch_size
                 if (batch_idx+1)*args.batch_size >= len(examples):
-                    end = -1
+                    end = len(examples)-1
                 else:
                     end = (batch_idx+1)*args.batch_size
 
-                if start == len(examples)-1:
-                    boards, pis, vs, turns, stales, valids = list(
-                        zip(*examples[start]))
+                if end-start < 100:  # minimum size of a batch
+
+                    break
+
                 else:
                     boards, pis, vs, turns, stales, valids = list(
                         zip(*examples[start:end]))
