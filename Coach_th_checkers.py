@@ -110,7 +110,7 @@ def TrainNetwork(nnet, game, args, iter_num, trainhistory):
     if not os.path.isfile(examplesFile):
         print(examplesFile)
     else:
-        print("File with trainExamples found. Read it.")
+        #print("File with trainExamples found. Read it.")
         with open(examplesFile, "rb") as f:
             for i in Unpickler(f).load():
                 trainhistory.append(i)
@@ -222,7 +222,7 @@ class Coach():
 
         pool.close()
         pool.join()
-        print("Done self-play")
+        #print("Done self-play")
 
         for i in res:
             gameplay, r = i.get()
@@ -239,7 +239,7 @@ class Coach():
         return temp
 
     def train_network(self, iter_num):
-        print("Start train network")
+        #print("Start train network")
         TrainNetwork(self.nnet, self.game, self.args,
                      iter_num, self.trainExamplesHistory)
 

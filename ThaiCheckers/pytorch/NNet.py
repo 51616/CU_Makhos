@@ -66,13 +66,14 @@ class NNetWrapper(NeuralNet):
             # end = time.time()
 
             # bar = Bar('Training Net', max=int(len(examples)/args.batch_size)+1)
-            bar = tqdm(total=int(len(examples)/args.batch_size))
+            number_of_batches = int(math.ceil(len(examples)/args.batch_size))
+            bar = tqdm(total=number_of_batches)
             batch_idx = 0
 
             train_pi_loss = 0
             train_v_loss = 0
 
-            while batch_idx < int(len(examples)/args.batch_size)+1:
+            while (batch_idx < number_of_batches):
                 start = batch_idx*args.batch_size
                 if (batch_idx+1)*args.batch_size >= len(examples):
                     end = len(examples)-1
@@ -144,8 +145,8 @@ class NNetWrapper(NeuralNet):
             #     bar.next()
             # bar.finish()
             bar.close()
-            print('Training Pi loss:', train_pi_loss,
-                  'Training V loss:', train_v_loss)
+            print('Training Pi loss:', train_pi_loss/number_of_batches,
+                  'Training V loss:', train_v_loss/number_of_batches)
             print()
 
             # val_pi_loss = 0
