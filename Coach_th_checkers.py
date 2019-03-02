@@ -223,8 +223,9 @@ class Coach():
         pool.join()
         print("Done self-play")
 
-        for i, r in res:
-            result.append(i.get())
+        for i in res:
+            gameplay, r = i.get()
+            result.append(gameplay)
             if (r == 1e-4):
                 self.draw_count += 1
             else:
