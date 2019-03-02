@@ -203,7 +203,8 @@ class Coach():
         self.args = args
         self.nnet = nn(game)
         self.trainExamplesHistory = []
-        self.win_loss_count = 0
+        self.win_count = 0
+        self.loss_count = 0
         self.draw_count = 0
 
     def parallel_self_play(self):
@@ -228,8 +229,10 @@ class Coach():
             result.append(gameplay)
             if (r == 1e-4):
                 self.draw_count += 1
+            elif r == 1:
+                self.win_count += 1
             else:
-                self.win_loss_count += 1
+                self.loss_count += 1
 
         for i in result:
             temp += i
