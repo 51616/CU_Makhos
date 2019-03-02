@@ -53,12 +53,12 @@ class NNetWrapper(NeuralNet):
         """
         examples: list of examples, each example is of form (board, pi, v)
         """
-        self.nnet.train()
+
         self.scheduler.step()
         for epoch in range(args.epochs):
             examples = random.sample(past_examples, len(past_examples)//8)
             print('EPOCH ::: ' + str(epoch+1))
-
+            self.nnet.train()
             # data_time = AverageMeter()
             # batch_time = AverageMeter()
             # pi_losses = AverageMeter()
@@ -110,8 +110,8 @@ class NNetWrapper(NeuralNet):
                 l_v = self.loss_v(target_vs, out_v)
                 total_loss = l_pi + l_v
 
-                train_pi_loss += l_pi
-                train_v_loss += l_v
+                train_pi_loss += l_pi.item()
+                train_v_loss += l_v.item()
 
                 # record loss
                 # pi_losses.update(l_pi.item(), boards.size(0))
@@ -150,6 +150,7 @@ class NNetWrapper(NeuralNet):
             val_v_loss = 0
             # Validation
             val_examples = random.sample(past_examples, len(past_examples)//2)
+            self.nnet.eval()
             with torch.no_grad():
                 batch_idx = 0
                 while batch_idx < int(len(val_examples)/args.batch_size)+1:
@@ -185,8 +186,8 @@ class NNetWrapper(NeuralNet):
                     # compute output
                     out_pi, out_v = self.nnet((boards, valids))
 
-                    val_pi_loss += self.loss_pi(target_pis, out_pi)
-                    val_v_loss = self.loss_v(target_vs, out_v)
+                    val_pi_loss += self.loss_pi(target_pis, out_pi).item()
+                    val_v_loss += self.loss_v(target_vs, out_v).item()
 
             print('Val Pi loss:', val_pi_loss)
             print('Val V loss:', val_v_loss)
