@@ -307,8 +307,9 @@ class Coach():
             iterationTrainExamples += temp
             #iterationTrainExamples = list(set(iterationTrainExamples))
 
-            print('Win/loss count:', self.win_loss_count)
-            print('Draw Count:', self.draw_count)
+            print('Win count:', self.win_count, 'Loss count:',
+                  self.loss_count, 'Draw count:', self.draw_count)
+           # print('Draw Count:', self.draw_count)
 
             self.trainExamplesHistory.append(iterationTrainExamples)
             self.train_network(i)
