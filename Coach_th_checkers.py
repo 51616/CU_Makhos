@@ -206,21 +206,18 @@ class Coach():
         self.trainExamplesHistory = []
 
     def parallel_self_play(self):
-        global draw_count
-        global win_loss_count
-        draw_count = 0
-        win_loss_count = 0
 
         pool = mp.Pool(processes=self.args.numSelfPlayPool)
         temp = []
         res = []
         result = []
         #bar = Bar('Self Play', max=self.args.numEps)
-        with tqdm(total=self.args.numEps) as pbar:
-            for i in range(self.args.numEps):
-                res.append(pool.apply_async(AsyncSelfPlay, args=(
-                    self.nnet, self.game, self.args, i, self.args.numEps)))  # , bar
-                pbar.update()
+        bar = tqdm(total=self.args.numEps)
+        for i in range(self.args.numEps):
+            bar.update()
+            res.append(pool.apply_async(AsyncSelfPlay, args=(
+                self.nnet, self.game, self.args, i, self.args.numEps)))  # , bar
+
         pool.close()
         pool.join()
         for i in res:
@@ -285,6 +282,9 @@ class Coach():
 
         for i in range(1, self.args.numIters+1):
             print('------ITER ' + str(i) + '------')
+
+            draw_count = 0
+            win_loss_count = 0
 
             iterationTrainExamples = deque([], maxlen=self.args.maxlenOfQueue)
             temp = self.parallel_self_play()

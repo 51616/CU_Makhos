@@ -18,6 +18,7 @@ import random
 import numpy as np
 import math
 import sys
+from tqdm import tqdm
 sys.path.append('../../')
 
 
