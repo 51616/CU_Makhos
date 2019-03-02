@@ -15,8 +15,6 @@ import torch
 from tqdm import tqdm
 
 mp = multiprocessing.get_context('spawn')
-win_loss_count = 0
-draw_count = 0
 
 
 def AsyncSelfPlay(net, game, args, iter_num, iterr):  # , bar
@@ -87,6 +85,13 @@ def AsyncSelfPlay(net, game, args, iter_num, iterr):  # , bar
             # print([(x[0], r*x[1])
             #        for x in trainExamples])
             # bar.update(1)
+            # global draw_count
+            # global win_loss_count
+            # if r == 1e-4:
+            #     draw_count += 1
+            # else:
+            #     win_loss_count += 1
+
             return [(x[0], x[2], r*x[1], x[3], x[4], x[5]) for x in trainExamples], r
 
 
@@ -210,20 +215,21 @@ class Coach():
         #bar = Bar('Self Play', max=self.args.numEps)
         #bar = tqdm(total=self.args.numEps)
         for i in range(self.args.numEps):
-            # bar.update(1)
-            game_history, result = pool.apply_async(AsyncSelfPlay, args=(
-                self.nnet, self.game, self.args, i, self.args.numEps))  # , bar
-            res.append(game_history)
 
-            if (result == 1e-4):
-                self.draw_count += 1
-            else:
-                self.win_loss_count += 1
+            res.append(pool.apply_async(AsyncSelfPlay, args=(
+                self.nnet, self.game, self.args, i, self.args.numEps)))  # , bar
+
         pool.close()
         pool.join()
         print("Done self-play")
-        for i in res:
+
+        for i, r in res:
             result.append(i.get())
+            if (r == 1e-4):
+                self.draw_count += 1
+            else:
+                self.win_loss_count += 1
+
         for i in result:
             temp += i
         return temp
