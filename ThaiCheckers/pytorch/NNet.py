@@ -38,7 +38,7 @@ class NNetWrapper(NeuralNet):
         self.game = game
         self.nnet = ResNet(game, block_filters=args.num_channels,
                            block_kernel=3, blocks=args.num_blocks).cuda().eval()
-        self.nnet.share_memory()
+
         self.board_x, self.board_y = game.getBoardSize()
         self.action_size = game.getActionSize()
         self.optimizer = optim.Adam(
@@ -49,6 +49,7 @@ class NNetWrapper(NeuralNet):
         #     self.nnet.cuda()
         # self.nnet.cuda()
         # self.nnet.eval()
+        self.nnet.share_memory()
 
     def train(self, past_examples):
         """
@@ -83,6 +84,7 @@ class NNetWrapper(NeuralNet):
 
                 if end-start < 100:  # minimum size of a batch
                     number_of_batches -= 1
+                    self.nnet.eval()
                     break
 
                 else:
