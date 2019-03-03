@@ -210,7 +210,7 @@ class NNetWrapper(NeuralNet):
                   'Val V loss:', val_v_loss/number_of_batches)
             print()
 
-        # self.nnet.eval()
+        self.nnet.eval()
 
     def predict(self, board, turn, stale, valids):
         """
@@ -256,13 +256,13 @@ class NNetWrapper(NeuralNet):
         checkpoint = torch.load(filepath, map_location=torch.device('cuda'))
 
         self.nnet.load_state_dict(checkpoint['state_dict'])
-        self.nnet.cuda().eval()
+        # self.nnet.cuda().eval()
         # self.nnet.share_memory()
 
-        self.optimizer = optim.Adam(
-            self.nnet.parameters(), lr=args.lr, weight_decay=0.0001)
-        self.scheduler = torch.optim.lr_scheduler.MultiStepLR(
-            self.optimizer, milestones=[100, 500, 1000], gamma=0.1)
+        # self.optimizer = optim.Adam(
+        #     self.nnet.parameters(), lr=args.lr, weight_decay=0.0001)
+        # self.scheduler = torch.optim.lr_scheduler.MultiStepLR(
+        #     self.optimizer, milestones=[100, 500, 1000], gamma=0.1)
 
         self.optimizer.load_state_dict(checkpoint['optimizer'])
         self.scheduler.load_state_dict(checkpoint['scheduler'])
