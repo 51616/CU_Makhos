@@ -326,12 +326,13 @@ class Coach():
 
             if i > 1:
                 try:
-                    #self.nnet = nn(self.game)
+                    self.nnet = nn(self.game)
                     self.nnet.load_checkpoint(
                         folder=self.args.checkpoint, filename='train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
                     print("Load Lastest model")
 
-                except:
+                except Exception as e:
+                    print(e)
                     print('train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
                     print('No checkpoint iter')
 
