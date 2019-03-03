@@ -253,7 +253,8 @@ class NNetWrapper(NeuralNet):
             print("No model in path {}".format(filepath))
             raise ValueError("No model in path {}".format(filepath))
 
-        checkpoint = torch.load(filepath, map_location=torch.device('cuda'))
+        # , map_location=torch.device('cuda')
+        checkpoint = torch.load(filepath)
 
         self.nnet.load_state_dict(checkpoint['state_dict'])
         # self.nnet.cuda().eval()
