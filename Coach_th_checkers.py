@@ -301,7 +301,7 @@ class Coach():
                 try:
                     self.nnet = nn(game)
                     self.nnet.load_checkpoint(
-                        folder=self.args.checkpoint, filename='train_iter_' + str(checkpoint_iter) + '.pth.tar')
+                        folder=self.args.checkpoint, filename='train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
                     print("Load Lastest model")
                 except:
                     print('No checkpoint iter')
@@ -318,13 +318,16 @@ class Coach():
 
             print('Win count:', self.win_count, 'Loss count:',
                   self.loss_count, 'Draw count:', self.draw_count)
-           # print('Draw Count:', self.draw_count)
-            if self.draw_count < 50:
+
+            if self.draw_count < 100:
                 self.checkpoint_iter = i
+                self.trainExamplesHistory.append(iterationTrainExamples)
+                self.train_network(i)
+                self.trainExamplesHistory.clear()
             else:
                 print('Too much draw, no checkpoint created')
 
-            self.trainExamplesHistory.append(iterationTrainExamples)
-            self.train_network(i)
-            self.trainExamplesHistory.clear()
+            # self.trainExamplesHistory.append(iterationTrainExamples)
+            # self.train_network(i)
+            # self.trainExamplesHistory.clear()
             # self.parallel_self_test_play(i)
