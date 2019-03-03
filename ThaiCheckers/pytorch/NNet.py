@@ -32,7 +32,7 @@ args = dotdict({
     'num_blocks': 20
 })
 
-torch.backends.cudnn.benchmark = True
+#torch.backends.cudnn.benchmark = True
 
 
 class NNetWrapper(NeuralNet):
