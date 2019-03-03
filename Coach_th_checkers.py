@@ -14,7 +14,7 @@ from torch import multiprocessing
 import torch
 from tqdm import tqdm
 
-mp = multiprocessing.get_context('forkserver')
+mp = multiprocessing.get_context('fork')
 
 
 def AsyncSelfPlay(net, game, args, iter_num, iterr):  # , bar
@@ -209,6 +209,34 @@ class Coach():
         self.draw_count = 0
         self.checkpoint_iter = 0
 
+    def parallel_self_play_process(self):
+        processes = []
+        temp = []
+        result = []
+
+        for i in range(self.args.numSelfPlayPool):
+            p = mp.Process(target=AsyncSelfPlay, args=(
+                self.nnet, self.game, self.args, i, self.args.numEps))
+            p.start()
+            processes.append(p)
+
+        for p in processes:
+            p.join()
+
+        for i in processes:
+            gameplay, r = i.get()
+            result.append(gameplay)
+            if (r == 1e-4):
+                self.draw_count += 1
+            elif r == 1:
+                self.win_count += 1
+            else:
+                self.loss_count += 1
+
+        for i in result:
+            temp += i
+        return temp
+
     def parallel_self_play(self):
 
         pool = mp.Pool(processes=self.args.numSelfPlayPool)
@@ -313,7 +341,7 @@ class Coach():
             self.draw_count = 0
 
             iterationTrainExamples = deque([], maxlen=self.args.maxlenOfQueue)
-            temp = self.parallel_self_play()
+            temp = self.parallel_self_play_process()
 
             iterationTrainExamples += temp
             # iterationTrainExamples = list(set(iterationTrainExamples))
