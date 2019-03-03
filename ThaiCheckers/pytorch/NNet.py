@@ -32,13 +32,15 @@ args = dotdict({
     'num_blocks': 20
 })
 
+torch.backends.cudnn.benchmark = True
+
 
 class NNetWrapper(NeuralNet):
     def __init__(self, game):
+
         self.game = game
         self.nnet = ResNet(game, block_filters=args.num_channels,
                            block_kernel=3, blocks=args.num_blocks).cuda().eval()
-
         self.board_x, self.board_y = game.getBoardSize()
         self.action_size = game.getActionSize()
         self.optimizer = optim.Adam(
