@@ -14,7 +14,7 @@ from torch import multiprocessing
 import torch
 from tqdm import tqdm
 
-mp = multiprocessing.get_context('fork')
+mp = multiprocessing.get_context('spawn')
 
 
 def AsyncSelfPlay(net, game, args, iter_num, iterr):  # , bar
