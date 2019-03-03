@@ -319,8 +319,10 @@ class Coach():
             print('Win count:', self.win_count, 'Loss count:',
                   self.loss_count, 'Draw count:', self.draw_count)
            # print('Draw Count:', self.draw_count)
-           if draw_count < 50 :
-               self.checkpoint_iter = i
+            if draw_count < 50:
+                self.checkpoint_iter = i
+            else:
+                print('Too much draw, no checkpoint created')
 
             self.trainExamplesHistory.append(iterationTrainExamples)
             self.train_network(i)
