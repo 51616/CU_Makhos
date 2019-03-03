@@ -208,7 +208,7 @@ class Coach():
         self.loss_count = 0
         self.draw_count = 0
         self.checkpoint_iter = 0
-        self.pool = mp.Pool(processes=self.args.numSelfPlayPool)
+
     # def parallel_self_play_process(self):
     #     processes = []
     #     temp = []
@@ -238,7 +238,7 @@ class Coach():
     #     return temp
 
     def parallel_self_play(self):
-
+        pool = mp.Pool(processes=self.args.numSelfPlayPool)
         temp = []
         res = []
         result = []
@@ -246,11 +246,11 @@ class Coach():
         # bar = tqdm(total=self.args.numEps)
         for i in range(self.args.numEps):
 
-            res.append(self.pool.apply_async(AsyncSelfPlay, args=(
+            res.append(pool.apply_async(AsyncSelfPlay, args=(
                 self.nnet, self.game, self.args, i, self.args.numEps)))  # , bar
 
-        self.pool.close()
-        self.pool.join()
+        pool.close()
+        pool.join()
         # print("Done self-play")
 
         for i in res:
