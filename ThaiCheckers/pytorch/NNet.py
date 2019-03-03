@@ -35,9 +35,10 @@ args = dotdict({
 
 class NNetWrapper(NeuralNet):
     def __init__(self, game):
+        self.game = game
         self.nnet = ResNet(game, block_filters=args.num_channels,
                            block_kernel=3, blocks=args.num_blocks).cuda().eval()
-        # self.nnet.share_memory()
+        self.nnet.share_memory()
         self.board_x, self.board_y = game.getBoardSize()
         self.action_size = game.getActionSize()
         self.optimizer = optim.Adam(
@@ -247,16 +248,24 @@ class NNetWrapper(NeuralNet):
         if not os.path.exists(filepath):
             print("No model in path {}".format(filepath))
             raise ValueError("No model in path {}".format(filepath))
+
+        self.nnet = ResNet(self.game, block_filters=args.num_channels,
+                           block_kernel=3, blocks=args.num_blocks)
+
         checkpoint = torch.load(filepath, map_location=torch.device('cuda'))
 
         self.nnet.load_state_dict(checkpoint['state_dict'])
         self.nnet.cuda().eval()
+        self.nnet.share_memory()
+
         self.optimizer = optim.Adam(
             self.nnet.parameters(), lr=args.lr, weight_decay=0.0001)
         self.scheduler = torch.optim.lr_scheduler.MultiStepLR(
             self.optimizer, milestones=[100, 500, 1000], gamma=0.1)
+
         self.optimizer.load_state_dict(checkpoint['optimizer'])
         self.scheduler.load_state_dict(checkpoint['scheduler'])
+
         print('Latest model loaded')
         # print(self.optimizer.state_dict())
         # print(self.scheduler.state_dict())
