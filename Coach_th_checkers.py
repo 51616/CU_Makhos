@@ -303,7 +303,10 @@ class Coach():
                     self.nnet.load_checkpoint(
                         folder=self.args.checkpoint, filename='train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
                     print("Load Lastest model")
-                except:
+
+                except e:
+                    print(e)
+                    print('train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
                     print('No checkpoint iter')
 
             self.win_count = 0
