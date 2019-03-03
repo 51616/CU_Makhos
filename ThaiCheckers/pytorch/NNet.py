@@ -37,7 +37,7 @@ class NNetWrapper(NeuralNet):
     def __init__(self, game):
         self.nnet = ResNet(game, block_filters=args.num_channels,
                            block_kernel=3, blocks=args.num_blocks).cuda().eval()
-        self.nnet.share_memory()
+        # self.nnet.share_memory()
         self.board_x, self.board_y = game.getBoardSize()
         self.action_size = game.getActionSize()
         self.optimizer = optim.Adam(
@@ -149,7 +149,6 @@ class NNetWrapper(NeuralNet):
                   'Training V loss:', train_v_loss/number_of_batches)
             print()
 
-            
             # Validation
             val_pi_loss = 0
             val_v_loss = 0
@@ -159,8 +158,9 @@ class NNetWrapper(NeuralNet):
             val_examples = random.sample(past_examples, len(past_examples)//2)
 
             batch_idx = 0
-            number_of_batches = int(math.ceil(len(val_examples)/args.batch_size))
-            
+            number_of_batches = int(
+                math.ceil(len(val_examples)/args.batch_size))
+
             while batch_idx < number_of_batches:
 
                 start = batch_idx*args.batch_size
@@ -193,7 +193,7 @@ class NNetWrapper(NeuralNet):
                     np.array(valids), dtype=torch.float32).cuda()
 
                 # compute output
-                
+
                 with torch.no_grad():
                     out_pi, out_v = self.nnet((boards, valids))
                     val_pi_loss += self.loss_pi(target_pis, out_pi).item()
@@ -201,10 +201,11 @@ class NNetWrapper(NeuralNet):
 
                 batch_idx += 1
 
-            print('Val Pi loss:', val_pi_loss/number_of_batches,'Val V loss:', val_v_loss/number_of_batches)
+            print('Val Pi loss:', val_pi_loss/number_of_batches,
+                  'Val V loss:', val_v_loss/number_of_batches)
             print()
 
-        #self.nnet.eval()
+        # self.nnet.eval()
 
     def predict(self, board, turn, stale, valids):
         """
