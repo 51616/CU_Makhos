@@ -249,14 +249,11 @@ class NNetWrapper(NeuralNet):
             print("No model in path {}".format(filepath))
             raise ValueError("No model in path {}".format(filepath))
 
-        self.nnet = ResNet(self.game, block_filters=args.num_channels,
-                           block_kernel=3, blocks=args.num_blocks)
-
         checkpoint = torch.load(filepath, map_location=torch.device('cuda'))
 
-        self.nnet.load_state_dict(checkpoint['state_dict'])
-        self.nnet.cuda().eval()
-        self.nnet.share_memory()
+        self.nnet.load_state_dict(checkpoint['state_dict']).cuda().eval()
+        # self.nnet.cuda().eval()
+        # self.nnet.share_memory()
 
         self.optimizer = optim.Adam(
             self.nnet.parameters(), lr=args.lr, weight_decay=0.0001)

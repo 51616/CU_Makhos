@@ -14,7 +14,7 @@ from torch import multiprocessing
 import torch
 from tqdm import tqdm
 
-mp = multiprocessing.get_context('spawn')
+mp = multiprocessing.get_context('forkserver')
 
 
 def AsyncSelfPlay(net, game, args, iter_num, iterr):  # , bar
@@ -299,7 +299,7 @@ class Coach():
 
             if i > 1:
                 try:
-                    self.nnet = nn(self.game)
+                    #self.nnet = nn(self.game)
                     self.nnet.load_checkpoint(
                         folder=self.args.checkpoint, filename='train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
                     print("Load Lastest model")
