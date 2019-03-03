@@ -204,7 +204,7 @@ class NNetWrapper(NeuralNet):
             print('Val Pi loss:', val_pi_loss/number_of_batches,'Val V loss:', val_v_loss/number_of_batches)
             print()
 
-        self.nnet.eval()
+        #self.nnet.eval()
 
     def predict(self, board, turn, stale, valids):
         """

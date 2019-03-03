@@ -49,7 +49,7 @@ def AsyncSelfPlay(net, game, args, iter_num, iterr):  # , bar
         episodeStep += 1
         canonicalBoard = game.getCanonicalForm(board, curPlayer)
         boardHistory.append(canonicalBoard)
-        #temp = int(episodeStep < args.tempThreshold)
+        # temp = int(episodeStep < args.tempThreshold)
         # print('canonical Board')
         # print(canonicalBoard)
         pi = mcts.getActionProb(boardHistory, temp=1)
@@ -99,7 +99,7 @@ def TrainNetwork(nnet, game, args, iter_num, trainhistory):
     # set gpu
     # os.environ["CUDA_VISIBLE_DEVICES"] = args.setGPU
     # create network for training
-    #nnet = nn(game)
+    # nnet = nn(game)
     # try:
     #     nnet.load_checkpoint(folder=args.checkpoint, filename='best.pth.tar')
     # except:
@@ -110,7 +110,7 @@ def TrainNetwork(nnet, game, args, iter_num, trainhistory):
     if not os.path.isfile(examplesFile):
         print(examplesFile)
     else:
-        #print("File with trainExamples found. Read it.")
+        # print("File with trainExamples found. Read it.")
         with open(examplesFile, "rb") as f:
             for i in Unpickler(f).load():
                 trainhistory.append(i)
@@ -207,6 +207,7 @@ class Coach():
         self.win_count = 0
         self.loss_count = 0
         self.draw_count = 0
+        self.checkpoint_iter = 0
 
     def parallel_self_play(self):
 
@@ -214,8 +215,8 @@ class Coach():
         temp = []
         res = []
         result = []
-        #bar = Bar('Self Play', max=self.args.numEps)
-        #bar = tqdm(total=self.args.numEps)
+        # bar = Bar('Self Play', max=self.args.numEps)
+        # bar = tqdm(total=self.args.numEps)
         for i in range(self.args.numEps):
 
             res.append(pool.apply_async(AsyncSelfPlay, args=(
@@ -223,7 +224,7 @@ class Coach():
 
         pool.close()
         pool.join()
-        #print("Done self-play")
+        # print("Done self-play")
 
         for i in res:
             gameplay, r = i.get()
@@ -240,7 +241,7 @@ class Coach():
         return temp
 
     def train_network(self, iter_num):
-        #print("Start train network")
+        # print("Start train network")
         TrainNetwork(self.nnet, self.game, self.args,
                      iter_num, self.trainExamplesHistory)
 
@@ -296,6 +297,15 @@ class Coach():
         for i in range(1, self.args.numIters+1):
             print('------ITER ' + str(i) + '------')
 
+            if i > 1:
+                try:
+                    self.nnet = nn(game)
+                    self.nnet.load_checkpoint(
+                        folder=self.args.checkpoint, filename='train_iter_' + str(checkpoint_iter) + '.pth.tar')
+                    print("Load Lastest model")
+                except:
+                    print('No checkpoint iter')
+
             self.win_count = 0
             self.loss_count = 0
             self.draw_count = 0
@@ -304,11 +314,13 @@ class Coach():
             temp = self.parallel_self_play()
 
             iterationTrainExamples += temp
-            #iterationTrainExamples = list(set(iterationTrainExamples))
+            # iterationTrainExamples = list(set(iterationTrainExamples))
 
             print('Win count:', self.win_count, 'Loss count:',
                   self.loss_count, 'Draw count:', self.draw_count)
            # print('Draw Count:', self.draw_count)
+           if draw_count < 50 :
+               self.checkpoint_iter = i
 
             self.trainExamplesHistory.append(iterationTrainExamples)
             self.train_network(i)
