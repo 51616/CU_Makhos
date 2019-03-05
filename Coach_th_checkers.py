@@ -360,19 +360,19 @@ class Coach():
         for i in range(1, self.args.numIters+1):
             print('------ITER ' + str(i) + '------')
 
-            # if i > 1:
-            #     try:
-            #         # self.nnet = nn(self.game)
-            #         self.nnet.load_checkpoint(
-            #             folder=self.args.checkpoint, filename='train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
-            #         self.nnet2.load_checkpoint(
-            #             folder=self.args.checkpoint, filename='train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
-            #         print("Load Lastest model")
+            if i > 1:
+                try:
+                    # self.nnet = nn(self.game)
+                    self.nnet.load_checkpoint(
+                        folder=self.args.checkpoint, filename='train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
+                    self.nnet2.load_checkpoint(
+                        folder=self.args.checkpoint, filename='train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
+                    print("Load Lastest model")
 
-            #     except Exception as e:
-            #         print(e)
-            #         print('train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
-            #         print('No checkpoint iter')
+                except Exception as e:
+                    print(e)
+                    print('train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
+                    print('No checkpoint iter')
 
             self.win_games = []
             self.loss_games = []
