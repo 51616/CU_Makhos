@@ -18,8 +18,6 @@ import copy
 
 mp = multiprocessing.get_context('spawn')
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"
-
 
 def AsyncSelfPlay(net, game, args, iter_num, iterr):  # , bar
 
