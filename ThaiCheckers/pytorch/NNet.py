@@ -63,7 +63,7 @@ class NNetWrapper(NeuralNet):
         """
         examples: list of examples, each example is of form (board, pi, v)
         """
-        self.nnet.to(self.device).train()
+        self.nnet.train()
         self.scheduler.step()
         for epoch in range(args.epochs):
             examples = random.sample(past_examples, len(past_examples)//8)
@@ -216,7 +216,7 @@ class NNetWrapper(NeuralNet):
             #       'Val V loss:', val_v_loss/number_of_batches)
             # print()
 
-        self.nnet.to(self.device).eval()
+        self.nnet.eval()
 
     def predict(self, board, turn, stale, valids):
         """

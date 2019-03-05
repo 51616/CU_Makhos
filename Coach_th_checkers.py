@@ -34,7 +34,10 @@ def AsyncSelfPlay(net, game, args, iter_num, iterr):  # , bar
     #     os.environ["CUDA_VISIBLE_DEVICES"] = args.setGPU
 
     # create nn and load
-    # net = nn(game)
+
+    net = nn(game, (iter_num % 2) + 1)
+    net.nnet.load_state_dict(net)
+
     mcts = MCTS(game, net, args)
     # try:
     #     net.load_checkpoint(folder=args.checkpoint, filename='best.pth.tar')
@@ -205,8 +208,8 @@ class Coach():
         self.game = game
         self.args = args
         self.nnet = nn(game, gpu_num=0)
-        self.nnet1 = nn(game, gpu_num=1)
-        self.nnet2 = nn(game, gpu_num=2)
+        # self.nnet1 = nn(game, gpu_num=1)
+        # self.nnet2 = nn(game, gpu_num=2)
         self.trainExamplesHistory = []
         self.checkpoint_iter = 0
 
@@ -258,13 +261,13 @@ class Coach():
         # bar = Bar('Self Play', max=self.args.numEps)
         # bar = tqdm(total=self.args.numEps)
         for i in range(self.args.numEps):
-            if i % 2 == 0:
-                net = self.nnet1
-            else:
-                net = self.nnet2
+            # if i % 2 == 0:
+            #     net = self.nnet1
+            # else:
+            #     net = self.nnet2
 
             res.append(pool.apply_async(AsyncSelfPlay, args=(
-                net, self.game, self.args, i, self.args.numEps)))  # , bar
+                self.nnet, self.game, self.args, i, self.args.numEps)))  # , bar
 
         pool.close()
         pool.join()
@@ -348,8 +351,8 @@ class Coach():
             try:
                 self.nnet.load_checkpoint(
                     folder=self.args.checkpoint, filename='train_iter_1.pth.tar')
-                self.nnet1.load_state_dict(self.nnet.state_dict())
-                self.nnet2.load_state_dict(self.nnet.state_dict())
+                # self.nnet1.load_state_dict(self.nnet.state_dict())
+                # self.nnet2.load_state_dict(self.nnet.state_dict())
 
             except:
                 print("Create a new model")
@@ -369,10 +372,10 @@ class Coach():
             #         print('train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
             #         print('No checkpoint iter')
 
-            self.nnet1.nnet.load_state_dict(
-                self.nnet.nnet.state_dict())
-            self.nnet2.nnet.load_state_dict(
-                self.nnet.nnet.state_dict())
+            # self.nnet1.nnet.load_state_dict(
+            #     self.nnet.nnet.state_dict())
+            # self.nnet2.nnet.load_state_dict(
+            #     self.nnet.nnet.state_dict())
 
             self.win_games = []
             self.loss_games = []
