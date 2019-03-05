@@ -362,7 +362,8 @@ class Coach():
 
             if i > 1:
                 try:
-                    # self.nnet = nn(self.game)
+                    self.nnet = nn(self.game)
+                    self.nnet2 = nn(self.game)
                     self.nnet.load_checkpoint(
                         folder=self.args.checkpoint, filename='train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
                     self.nnet2.load_checkpoint(
