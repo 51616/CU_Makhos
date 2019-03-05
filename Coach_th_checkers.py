@@ -19,7 +19,7 @@ import copy
 mp = multiprocessing.get_context('spawn')
 
 
-def AsyncSelfPlay(net, game, args, iter_num, iterr):  # , bar
+def AsyncSelfPlay(nnet, game, args, iter_num, iterr):  # , bar
 
     # bar.suffix = "iter:{i}/{x} | Total: {total:} | ETA: {eta:}".format(
     #     i=iter_num+1, x=iterr, total=bar.elapsed_td, eta=bar.eta_td)
@@ -36,7 +36,7 @@ def AsyncSelfPlay(net, game, args, iter_num, iterr):  # , bar
     # create nn and load
 
     net = nn(game, (iter_num % 2) + 1)
-    net.nnet.load_state_dict(net)
+    net.nnet.load_state_dict(nnet.state_dict())
 
     mcts = MCTS(game, net, args)
     # try:
