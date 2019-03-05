@@ -358,19 +358,19 @@ class Coach():
         for i in range(1, self.args.numIters+1):
             print('------ITER ' + str(i) + '------')
 
-            if i > 1:
-                try:
-                    # self.nnet = nn(self.game)
-                    self.nnet.load_checkpoint(
-                        folder=self.args.checkpoint, filename='train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
-                    self.nnet2.load_checkpoint(
-                        folder=self.args.checkpoint, filename='train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
-                    print("Load Lastest model")
+            # if i > 1:
+            #     try:
+            #         # self.nnet = nn(self.game)
+            #         self.nnet.load_checkpoint(
+            #             folder=self.args.checkpoint, filename='train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
+            #         self.nnet2.load_checkpoint(
+            #             folder=self.args.checkpoint, filename='train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
+            #         print("Load Lastest model")
 
-                except Exception as e:
-                    print(e)
-                    print('train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
-                    print('No checkpoint iter')
+            #     except Exception as e:
+            #         print(e)
+            #         print('train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
+            #         print('No checkpoint iter')
 
             self.win_games = []
             self.loss_games = []
@@ -380,9 +380,9 @@ class Coach():
 
             temp = self.parallel_self_play()
 
-            iterationTrainExamples += temp
-            #iterationTrainExamples += self.win_games
-            #iterationTrainExamples += self.loss_games
+            # iterationTrainExamples += temp
+            iterationTrainExamples += self.win_games
+            iterationTrainExamples += self.loss_games
 
             print('Win count:', self.win_count, 'Loss count:',
                   self.loss_count, 'Draw count:', self.draw_count)
@@ -393,19 +393,19 @@ class Coach():
             # games += self.win_games
             # games += self.loss_games
 
-            # if self.draw_count <= (self.win_count + self.loss_count):
-            #     iterationTrainExamples += self.draw_games
-            #     self.trainExamplesHistory.append(iterationTrainExamples)
+            if self.draw_count <= (self.win_count + self.loss_count):
+                iterationTrainExamples += self.draw_games
+                self.trainExamplesHistory.append(iterationTrainExamples)
 
-            # else:
-            #     win_loss_count = len(self.win_games) + len(self.loss_games)
+            else:
+                win_loss_count = len(self.win_games) + len(self.loss_games)
 
-            #     sample_draw_games = random.sample(
-            #         self.draw_games, win_loss_count)  # get samples from draw games
+                sample_draw_games = random.sample(
+                    self.draw_games, win_loss_count)  # get samples from draw games
 
-            #     iterationTrainExamples += sample_draw_games
-            #     print('Too much draw, add all win/loss games and ',
-            #     str(win_loss_count), ' draw moves')
+                iterationTrainExamples += sample_draw_games
+                print('Too much draw, add all win/loss games and ',
+                      str(win_loss_count), ' draw moves')
 
             self.trainExamplesHistory.append(iterationTrainExamples)
 
