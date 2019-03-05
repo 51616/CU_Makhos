@@ -380,8 +380,8 @@ class Coach():
 
             temp = self.parallel_self_play()
 
-            #iterationTrainExamples += temp
-            iterationTrainExamples += self.win_games
+            iterationTrainExamples += temp
+            #iterationTrainExamples += self.win_games
             #iterationTrainExamples += self.loss_games
 
             print('Win count:', self.win_count, 'Loss count:',
