@@ -258,6 +258,7 @@ class Coach():
                 net = self.nnet
             else:
                 net = self.nnet2
+
             res.append(pool.apply_async(AsyncSelfPlay, args=(
                 net, self.game, self.args, i, self.args.numEps)))  # , bar
 
@@ -280,7 +281,11 @@ class Coach():
         return temp
 
     def train_network(self, iter_num):
+
         # print("Start train network")
+        os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+        torch.cuda.set_device('cuda:0')
+
         TrainNetwork(self.nnet, self.game, self.args,
                      iter_num, self.trainExamplesHistory)
 
