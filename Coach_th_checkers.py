@@ -380,38 +380,32 @@ class Coach():
 
             temp = self.parallel_self_play()
 
-            iterationTrainExamples += temp
-            print(temp[0])
-            print('len temp', len(temp))
-            print('temp shape', np.array(temp).shape)
-
-            print(iterationTrainExamples[0])
-            print('len train samples', len(iterationTrainExamples))
-            print('train samples shape', np.array(
-                iterationTrainExamples).shape)
-            # iterationTrainExamples = list(set(iterationTrainExamples))
+            #iterationTrainExamples += temp
+            iterationTrainExamples += self.win_games
+            iterationTrainExamples += self.loss_games
 
             print('Win count:', self.win_count, 'Loss count:',
                   self.loss_count, 'Draw count:', self.draw_count)
 
             self.checkpoint_iter = i
 
-            games = []
-            games += self.win_games
-            games += self.loss_games
+            # games = []
+            # games += self.win_games
+            # games += self.loss_games
 
             if self.draw_count <= (self.win_count + self.loss_count):
-                games += self.draw_games
-                self.trainExamplesHistory.append(games)
+                iterationTrainExamples += self.draw_games
+                self.trainExamplesHistory.append(iterationTrainExamples)
 
             else:
-                win_loss_count = self.win_count + self.loss_count
+                win_loss_count = len(self.win_games) + len(self.loss_games)
 
                 sample_draw_games = random.sample(
-                    self.draw_games, win_loss_count)
+                    self.draw_games, win_loss_count)  # get samples from draw games
 
-                games += sample_draw_games
-                self.trainExamplesHistory.append(games)
+                iterationTrainExamples += sample_draw_games
+                self.trainExamplesHistory.append(iterationTrainExamples)
+
                 print('Too much draw, add all win/loss games and ',
                       str(win_loss_count), ' draw games')
 
