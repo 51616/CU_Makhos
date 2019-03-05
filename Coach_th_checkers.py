@@ -16,7 +16,7 @@ from tqdm import tqdm
 import random
 import copy
 
-mp = multiprocessing.get_context('spawn')
+mp = multiprocessing.get_context('forkserver')
 
 
 def AsyncSelfPlay(nnet, game, args, iter_num, iterr):  # , bar
