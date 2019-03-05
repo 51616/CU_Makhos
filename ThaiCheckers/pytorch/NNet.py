@@ -48,7 +48,7 @@ class NNetWrapper(NeuralNet):
             self.nnet.parameters(), lr=args.lr, weight_decay=0.0001)
         self.scheduler = torch.optim.lr_scheduler.MultiStepLR(
             self.optimizer, milestones=[100, 200, 500], gamma=0.1)
-        self.min_batch_size = 1
+        self.min_batch_size = 100
         # if args.cuda:
         #     self.nnet.cuda()
         # self.nnet.cuda()

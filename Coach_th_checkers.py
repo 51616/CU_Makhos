@@ -17,6 +17,8 @@ import random
 
 mp = multiprocessing.get_context('spawn')
 
+os.environ["CUDA_VISIBLE_DEVICES"] = "0,1"
+
 
 def AsyncSelfPlay(net, game, args, iter_num, iterr):  # , bar
 
@@ -298,7 +300,7 @@ class Coach():
     def train_network(self, iter_num):
 
         # print("Start train network")
-        os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
         torch.cuda.set_device('cuda:0')
 
         TrainNetwork(self.nnet, self.game, self.args,
