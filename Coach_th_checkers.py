@@ -251,6 +251,10 @@ class Coach():
         temp = []
         res = []
         result = []
+
+        temp_draw_games = []
+        temp_win_games = []
+        temp_loss_games = []
         # bar = Bar('Self Play', max=self.args.numEps)
         # bar = tqdm(total=self.args.numEps)
         for i in range(self.args.numEps):
@@ -270,14 +274,25 @@ class Coach():
             gameplay, r = i.get()
             result.append(gameplay)
             if (r == 1e-4):
-                self.draw_games += gameplay
+                self.draw_count += 1
+                temp_draw_games.append(gameplay)
             elif r == 1:
-                self.win_games += gameplay
+                self.win_count += 1
+                temp_win_games.append(gameplay)
             else:
-                self.loss_games += gameplay
+                self.loss_count += 1
+                temp_loss_games.append(gameplay)
 
         for i in result:
             temp += i
+        for i in temp_draw_games:
+            self.draw_games += i
+
+        for i in temp_win_games:
+            self.win_games += i
+
+        for i in temp_loss_games:
+            self.loss_games += i
         return temp
 
     def train_network(self, iter_num):
@@ -366,6 +381,14 @@ class Coach():
             temp = self.parallel_self_play()
 
             iterationTrainExamples += temp
+            print(temp[0])
+            print('len temp', len(temp))
+            print('temp shape', np.array(temp).shape)
+
+            print(iterationTrainExamples[0])
+            print('len train samples', len(iterationTrainExamples))
+            print('train samples shape', np.array(
+                iterationTrainExamples).shape)
             # iterationTrainExamples = list(set(iterationTrainExamples))
 
             print('Win count:', self.win_count, 'Loss count:',
