@@ -322,9 +322,9 @@ class Coach():
         if self.args.load_model:
             try:
                 self.nnet.load_checkpoint(
-                    folder=self.args.checkpoint, filename='train.pth.tar')
+                    folder=self.args.checkpoint, filename='train_iter_1.pth.tar')
                 self.nnet2.load_checkpoint(
-                    folder=self.args.checkpoint, filename='train.pth.tar')
+                    folder=self.args.checkpoint, filename='train_iter_1.pth.tar')
                 print("Load old model")
 
             except:
