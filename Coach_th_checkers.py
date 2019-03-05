@@ -358,7 +358,9 @@ class Coach():
                 print("Create a new model")
 
         for i in range(1, self.args.numIters+1):
-            print('------ITER ' + str(i) + '------')
+            self.args.numMCTSSims += 1
+            print('------ITER ' + str(i) + '------' +
+                  '\tMCTS sim:' + str(self.args.numMCTSSims))
 
             # if i > 1:
             #     try:
@@ -373,7 +375,6 @@ class Coach():
 
             self.nnet1.nnet.load_state_dict(self.nnet.nnet.state_dict())
             self.nnet2.nnet.load_state_dict(self.nnet.nnet.state_dict())
-            self.args.numMCTSSims += 1
 
             self.win_count = 0
             self.loss_count = 0
