@@ -37,11 +37,14 @@ args = dotdict({
 
 class NNetWrapper(NeuralNet):
     def __init__(self, game, gpu_num):
-        torch.cuda.set_device(f'cuda:{gpu_num}')
+        self.gpu_num = gpu_num
 
+        self.device = f'cuda:{self.gpu_num}'
+
+        torch.cuda.set_device(self.device)
         self.game = game
         self.nnet = ResNet(game, block_filters=args.num_channels,
-                           block_kernel=3, blocks=args.num_blocks).cuda().eval()
+                           block_kernel=3, blocks=args.num_blocks).to(self.device).eval()
 
         self.board_x, self.board_y = game.getBoardSize()
         self.action_size = game.getActionSize()
@@ -60,12 +63,12 @@ class NNetWrapper(NeuralNet):
         """
         examples: list of examples, each example is of form (board, pi, v)
         """
-
+        self.nnet.train()
         self.scheduler.step()
         for epoch in range(args.epochs):
             examples = random.sample(past_examples, len(past_examples)//8)
             print('EPOCH ::: ' + str(epoch+1))
-            self.nnet.train()
+
             # data_time = AverageMeter()
             # batch_time = AverageMeter()
             # pi_losses = AverageMeter()
@@ -105,14 +108,14 @@ class NNetWrapper(NeuralNet):
                         boards[i], turns[i], stales[i]))
 
                 boards = torch.as_tensor(
-                    np.array(stacked_board), dtype=torch.float32).cuda()
+                    np.array(stacked_board), dtype=torch.float32).to(self.device)
 
                 target_pis = torch.as_tensor(
-                    np.array(pis), dtype=torch.float32).cuda()
+                    np.array(pis), dtype=torch.float32).to(self.device)
                 target_vs = torch.as_tensor(
-                    np.array(vs), dtype=torch.float32).cuda()
+                    np.array(vs), dtype=torch.float32).to(self.device)
                 valids = torch.as_tensor(
-                    np.array(valids), dtype=torch.float32).cuda()
+                    np.array(valids), dtype=torch.float32).to(self.device)
 
                 # compute output
                 out_pi, out_v = self.nnet((boards, valids))
@@ -158,8 +161,8 @@ class NNetWrapper(NeuralNet):
             print()
 
             # Validation
-            val_pi_loss = 0
-            val_v_loss = 0
+            # val_pi_loss = 0
+            # val_v_loss = 0
 
             # self.nnet.cuda().eval()
 
@@ -222,8 +225,8 @@ class NNetWrapper(NeuralNet):
 
         board = self.convertToModelInput(board, turn, stale)
         # preparing input
-        board = torch.as_tensor(board, dtype=torch.float32).cuda()
-        valids = torch.as_tensor(valids, dtype=torch.float32).cuda()
+        board = torch.as_tensor(board, dtype=torch.float32).to(self.device)
+        valids = torch.as_tensor(valids, dtype=torch.float32).to(self.device)
         # self.nnet.eval()
         pi, v = self.nnet((board, valids))
 
@@ -260,7 +263,7 @@ class NNetWrapper(NeuralNet):
         checkpoint = torch.load(filepath)
 
         self.nnet.load_state_dict(checkpoint['state_dict'])
-        self.nnet.cuda().eval()
+        self.nnet.to(self.device).eval()
         self.nnet.share_memory()
 
         # self.optimizer = optim.Adam(
