@@ -16,7 +16,7 @@ from tqdm import tqdm
 import random
 import copy
 
-mp = multiprocessing.get_context('forkserver')
+mp = multiprocessing.get_context('spawn')
 
 
 def AsyncSelfPlay(nnet, game, args, iter_num, iterr):  # , bar
@@ -35,10 +35,10 @@ def AsyncSelfPlay(nnet, game, args, iter_num, iterr):  # , bar
 
     # create nn and load
 
-    net = nn(game, (iter_num % 2) + 1)
-    net.nnet.load_state_dict(nnet.nnet.state_dict())
+    # net = nn(game, (iter_num % 2) + 1)
+    # net.nnet.load_state_dict(nnet.nnet.state_dict())
 
-    mcts = MCTS(game, net, args)
+    mcts = MCTS(game, nnet, args)
     # try:
     #     net.load_checkpoint(folder=args.checkpoint, filename='best.pth.tar')
     # except:
@@ -208,8 +208,8 @@ class Coach():
         self.game = game
         self.args = args
         self.nnet = nn(game, gpu_num=0)
-        # self.nnet1 = nn(game, gpu_num=1)
-        # self.nnet2 = nn(game, gpu_num=2)
+        self.nnet1 = nn(game, gpu_num=2)
+        self.nnet2 = nn(game, gpu_num=3)
         self.trainExamplesHistory = []
         self.checkpoint_iter = 0
 
@@ -261,13 +261,13 @@ class Coach():
         # bar = Bar('Self Play', max=self.args.numEps)
         # bar = tqdm(total=self.args.numEps)
         for i in range(self.args.numEps):
-            # if i % 2 == 0:
-            #     net = self.nnet1
-            # else:
-            #     net = self.nnet2
+            if i % 2 == 0:
+                net = self.nnet1
+            else:
+                net = self.nnet2
 
             res.append(pool.apply_async(AsyncSelfPlay, args=(
-                self.nnet, self.game, self.args, i, self.args.numEps)))  # , bar
+                net, self.game, self.args, i, self.args.numEps)))  # , bar
 
         pool.close()
         pool.join()
@@ -363,19 +363,15 @@ class Coach():
             # if i > 1:
             #     try:
             #         # self.nnet = nn(self.game, gpu_num=0)
-            #         # self.nnet2 = nn(self.game, gpu_num=1)
-            #         self.nnet.load_checkpoint(
-            #             folder=self.args.checkpoint, filename='train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
+            self.nnet.load_checkpoint(
+                folder=self.args.checkpoint, filename='train_iter_'+str(self.checkpoint_iter)+'.pth.tar')
 
             #     except Exception as e:
             #         print(e)
             #         print('train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
             #         print('No checkpoint iter')
-
-            # self.nnet1.nnet.load_state_dict(
-            #     self.nnet.nnet.state_dict())
-            # self.nnet2.nnet.load_state_dict(
-            #     self.nnet.nnet.state_dict())
+            self.nnet1.nnet.load_state_dict(self.nnet.nnet.state_dict())
+            self.nnet2.nnet.load_state_dict(self.nnet.nnet.state_dict())
 
             self.win_games = []
             self.loss_games = []

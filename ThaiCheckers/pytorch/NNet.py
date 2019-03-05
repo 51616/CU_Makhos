@@ -157,7 +157,6 @@ class NNetWrapper(NeuralNet):
             bar.close()
             print('Training Pi loss:', train_pi_loss/number_of_batches,
                   'Training V loss:', train_v_loss/number_of_batches)
-            print()
 
         # Validation
         val_pi_loss = 0
@@ -257,7 +256,7 @@ class NNetWrapper(NeuralNet):
             raise ValueError("No model in path {}".format(filepath))
 
         # , map_location=torch.device('cuda')
-        checkpoint = torch.load(filepath, map_location=self.device)
+        checkpoint = torch.load(filepath)
 
         self.nnet.load_state_dict(checkpoint['state_dict'])
         # self.nnet.to(self.device).eval()
