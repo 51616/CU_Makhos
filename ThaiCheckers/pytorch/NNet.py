@@ -51,13 +51,13 @@ class NNetWrapper(NeuralNet):
         self.optimizer = optim.Adam(
             self.nnet.parameters(), lr=args.lr, weight_decay=0.0001)
         self.scheduler = torch.optim.lr_scheduler.MultiStepLR(
-            self.optimizer, milestones=[100, 200, 500], gamma=0.1)
+            self.optimizer, milestones=[50, 100, 200], gamma=0.5)
         self.min_batch_size = 100
         # if args.cuda:
         #     self.nnet.cuda()
         # self.nnet.cuda()
         # self.nnet.eval()
-        self.nnet.share_memory()
+        # self.nnet.share_memory()
 
     def train(self, past_examples):
         """
@@ -92,7 +92,6 @@ class NNetWrapper(NeuralNet):
 
                 if end-start < self.min_batch_size:  # minimum size of a batch
                     number_of_batches -= 1
-                    self.nnet.eval()
                     break
 
                 else:
@@ -161,60 +160,60 @@ class NNetWrapper(NeuralNet):
             print()
 
             # Validation
-            # val_pi_loss = 0
-            # val_v_loss = 0
+            val_pi_loss = 0
+            val_v_loss = 0
 
-            # self.nnet.cuda().eval()
+            self.nnet.eval()
 
-            # val_examples = random.sample(past_examples, len(past_examples)//2)
+            val_examples = random.sample(past_examples, len(past_examples)//2)
 
-            # batch_idx = 0
-            # number_of_batches = int(
-            #     math.ceil(len(val_examples)/args.batch_size))
+            batch_idx = 0
+            number_of_batches = int(
+                math.ceil(len(val_examples)/args.batch_size))
 
-            # while batch_idx < number_of_batches:
+            while batch_idx < number_of_batches:
 
-            #     start = batch_idx*args.batch_size
-            #     if (batch_idx+1)*args.batch_size >= len(val_examples):
-            #         end = len(val_examples)-1
-            #     else:
-            #         end = (batch_idx+1)*args.batch_size
+                start = batch_idx*args.batch_size
+                if (batch_idx+1)*args.batch_size >= len(val_examples):
+                    end = len(val_examples)-1
+                else:
+                    end = (batch_idx+1)*args.batch_size
 
-            #     if end-start < self.min_batch_size:  # minimum size of a batch
-            #         number_of_batches -= 1
-            #         break
+                if end-start < self.min_batch_size:  # minimum size of a batch
+                    number_of_batches -= 1
+                    break
 
-            #     else:
-            #         boards, pis, vs, turns, stales, valids = list(
-            #             zip(*val_examples[start:end]))
+                else:
+                    boards, pis, vs, turns, stales, valids = list(
+                        zip(*val_examples[start:end]))
 
-            #     stacked_board = []
-            #     for i in range(len(boards)):
-            #         stacked_board.append(self.convertToModelInput(
-            #             boards[i], turns[i], stales[i]))
+                stacked_board = []
+                for i in range(len(boards)):
+                    stacked_board.append(self.convertToModelInput(
+                        boards[i], turns[i], stales[i]))
 
-            #     boards = torch.as_tensor(
-            #         np.array(stacked_board), dtype=torch.float32).cuda()
+                boards = torch.as_tensor(
+                    np.array(stacked_board), dtype=torch.float32).cuda()
 
-            #     target_pis = torch.as_tensor(
-            #         np.array(pis), dtype=torch.float32).cuda()
-            #     target_vs = torch.as_tensor(
-            #         np.array(vs), dtype=torch.float32).cuda()
-            #     valids = torch.as_tensor(
-            #         np.array(valids), dtype=torch.float32).cuda()
+                target_pis = torch.as_tensor(
+                    np.array(pis), dtype=torch.float32).cuda()
+                target_vs = torch.as_tensor(
+                    np.array(vs), dtype=torch.float32).cuda()
+                valids = torch.as_tensor(
+                    np.array(valids), dtype=torch.float32).cuda()
 
-            #     # compute output
+                # compute output
 
-            #     with torch.no_grad():
-            #         out_pi, out_v = self.nnet((boards, valids))
-            #         val_pi_loss += self.loss_pi(target_pis, out_pi).item()
-            #         val_v_loss += self.loss_v(target_vs, out_v).item()
+                with torch.no_grad():
+                    out_pi, out_v = self.nnet((boards, valids))
+                    val_pi_loss += self.loss_pi(target_pis, out_pi).item()
+                    val_v_loss += self.loss_v(target_vs, out_v).item()
 
-            #     batch_idx += 1
+                batch_idx += 1
 
-            # print('Val Pi loss:', val_pi_loss/number_of_batches,
-            #       'Val V loss:', val_v_loss/number_of_batches)
-            # print()
+            print('Val Pi loss:', val_pi_loss/number_of_batches,
+                  'Val V loss:', val_v_loss/number_of_batches)
+            print()
 
         self.nnet.eval()
 
