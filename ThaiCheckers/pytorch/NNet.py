@@ -63,7 +63,7 @@ class NNetWrapper(NeuralNet):
         """
         examples: list of examples, each example is of form (board, pi, v)
         """
-        self.nnet.train()
+        self.nnet.to(self.device).train()
         self.scheduler.step()
         for epoch in range(args.epochs):
             examples = random.sample(past_examples, len(past_examples)//8)
@@ -216,7 +216,7 @@ class NNetWrapper(NeuralNet):
             #       'Val V loss:', val_v_loss/number_of_batches)
             # print()
 
-        self.nnet.eval()
+        self.nnet.to(self.device).eval()
 
     def predict(self, board, turn, stale, valids):
         """
@@ -260,11 +260,11 @@ class NNetWrapper(NeuralNet):
             raise ValueError("No model in path {}".format(filepath))
 
         # , map_location=torch.device('cuda')
-        checkpoint = torch.load(filepath)
+        checkpoint = torch.load(filepath, map_location=self.device)
 
         self.nnet.load_state_dict(checkpoint['state_dict'])
-        self.nnet.to(self.device).eval()
-        self.nnet.share_memory()
+        # self.nnet.to(self.device).eval()
+        # self.nnet.share_memory()
 
         # self.optimizer = optim.Adam(
         #     self.nnet.parameters(), lr=args.lr, weight_decay=0.0001)

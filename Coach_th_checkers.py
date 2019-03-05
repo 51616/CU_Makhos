@@ -14,10 +14,11 @@ from torch import multiprocessing
 import torch
 from tqdm import tqdm
 import random
+import copy
 
 mp = multiprocessing.get_context('spawn')
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0,1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"
 
 
 def AsyncSelfPlay(net, game, args, iter_num, iterr):  # , bar
@@ -28,11 +29,9 @@ def AsyncSelfPlay(net, game, args, iter_num, iterr):  # , bar
     # #set gpu
     if(args.multiGPU):
         if(iter_num % 2 == 0):
-            os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-            torch.cuda.set_device('cuda:0')
-        else:
-            os.environ["CUDA_VISIBLE_DEVICES"] = "1"
             torch.cuda.set_device('cuda:1')
+        else:
+            torch.cuda.set_device('cuda:2')
     # else:
     #     os.environ["CUDA_VISIBLE_DEVICES"] = args.setGPU
 
@@ -208,7 +207,8 @@ class Coach():
         self.game = game
         self.args = args
         self.nnet = nn(game, gpu_num=0)
-        self.nnet2 = nn(game, gpu_num=1)
+        self.nnet1 = nn(game, gpu_num=1)
+        self.nnet2 = nn(game, gpu_num=2)
         self.trainExamplesHistory = []
         self.checkpoint_iter = 0
 
@@ -261,7 +261,7 @@ class Coach():
         # bar = tqdm(total=self.args.numEps)
         for i in range(self.args.numEps):
             if i % 2 == 0:
-                net = self.nnet
+                net = self.nnet1
             else:
                 net = self.nnet2
 
@@ -350,9 +350,8 @@ class Coach():
             try:
                 self.nnet.load_checkpoint(
                     folder=self.args.checkpoint, filename='train_iter_1.pth.tar')
-                self.nnet2.load_checkpoint(
-                    folder=self.args.checkpoint, filename='train_iter_1.pth.tar')
-                print("Load old model")
+                self.nnet1.load_state_dict(self.nnet.state_dict())
+                self.nnet2.load_state_dict(self.nnet.state_dict())
 
             except:
                 print("Create a new model")
@@ -360,20 +359,22 @@ class Coach():
         for i in range(1, self.args.numIters+1):
             print('------ITER ' + str(i) + '------')
 
-            if i > 1:
-                try:
-                    self.nnet = nn(self.game, gpu_num=0)
-                    self.nnet2 = nn(self.game, gpu_num=1)
-                    self.nnet.load_checkpoint(
-                        folder=self.args.checkpoint, filename='train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
-                    self.nnet2.load_checkpoint(
-                        folder=self.args.checkpoint, filename='train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
-                    print("Load Lastest model")
+            # if i > 1:
+            #     try:
+            #         # self.nnet = nn(self.game, gpu_num=0)
+            #         # self.nnet2 = nn(self.game, gpu_num=1)
+            #         self.nnet.load_checkpoint(
+            #             folder=self.args.checkpoint, filename='train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
 
-                except Exception as e:
-                    print(e)
-                    print('train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
-                    print('No checkpoint iter')
+            #     except Exception as e:
+            #         print(e)
+            #         print('train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
+            #         print('No checkpoint iter')
+
+            self.nnet1.nnet.load_state_dict(
+                self.nnet.nnet.state_dict())
+            self.nnet2.nnet.load_state_dict(
+                self.nnet.nnet.state_dict())
 
             self.win_games = []
             self.loss_games = []
