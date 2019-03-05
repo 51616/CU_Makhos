@@ -364,11 +364,11 @@ class Coach():
             # iterationTrainExamples = list(set(iterationTrainExamples))
 
             print('Win count:', self.win_count, 'Loss count:',
-                  self.loss_count, 'Draw count:', self.draw_count
+                  self.loss_count, 'Draw count:', self.draw_count)
 
-            self.checkpoint_iter=i
+            self.checkpoint_iter = i
 
-            games=[]
+            games = []
             games += self.win_games
             games += self.loss_games
 
@@ -377,9 +377,9 @@ class Coach():
                 self.trainExamplesHistory.append(games)
 
             else:
-                win_loss_count=self.win_count + self.loss_count
+                win_loss_count = self.win_count + self.loss_count
 
-                sample_draw_games=random.sample(
+                sample_draw_games = random.sample(
                     self.draw_games, win_loss_count)
 
                 games += sample_draw_games
