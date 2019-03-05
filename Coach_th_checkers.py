@@ -360,16 +360,16 @@ class Coach():
         for i in range(1, self.args.numIters+1):
             print('------ITER ' + str(i) + '------')
 
-            # if i > 1:
-            #     try:
-            #         # self.nnet = nn(self.game, gpu_num=0)
-            #         self.nnet.load_checkpoint(
-            #             folder=self.args.checkpoint, filename='train_iter_'+str(self.checkpoint_iter)+'.pth.tar')
+            if i > 1:
+                try:
+                    # self.nnet = nn(self.game, gpu_num=0)
+                    self.nnet.load_checkpoint(
+                        folder=self.args.checkpoint, filename='train_iter_'+str(self.checkpoint_iter)+'.pth.tar')
 
-            #     except Exception as e:
-            #         print(e)
-            #         print('train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
-            #         print('No checkpoint iter')
+                except Exception as e:
+                    print(e)
+                    print('train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
+                    print('No checkpoint iter')
 
             self.nnet1.nnet.load_state_dict(self.nnet.nnet.state_dict())
             self.nnet2.nnet.load_state_dict(self.nnet.nnet.state_dict())
