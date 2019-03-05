@@ -36,7 +36,7 @@ def AsyncSelfPlay(nnet, game, args, iter_num, iterr):  # , bar
     # create nn and load
 
     net = nn(game, (iter_num % 2) + 1)
-    net.nnet.load_state_dict(nnet.state_dict())
+    net.nnet.load_state_dict(nnet.nnet.state_dict())
 
     mcts = MCTS(game, net, args)
     # try:
