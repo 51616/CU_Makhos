@@ -13,6 +13,7 @@ from random import shuffle
 from torch import multiprocessing
 import torch
 from tqdm import tqdm
+import random
 
 mp = multiprocessing.get_context('spawn')
 
@@ -23,11 +24,13 @@ def AsyncSelfPlay(net, game, args, iter_num, iterr):  # , bar
     #     i=iter_num+1, x=iterr, total=bar.elapsed_td, eta=bar.eta_td)
 
     # #set gpu
-    # if(args.multiGPU):
-    #     if(iter_num%2==0):
-    #         os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-    #     else:
-    #         os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+    if(args.multiGPU):
+        if(iter_num % 2 == 0):
+            os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+            torch.cuda.set_device('cuda:0')
+        else:
+            os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+            torch.cuda.set_device('cuda:1')
     # else:
     #     os.environ["CUDA_VISIBLE_DEVICES"] = args.setGPU
 
@@ -141,56 +144,56 @@ def TrainNetwork(nnet, game, args, iter_num, trainhistory):
                          filename='train_iter_' + str(iter_num) + '.pth.tar')
 
 
-def AsyncAgainst(game, args, iter_num, bar):
-    bar.suffix = "iter:{i}/{x} | Total: {total:} | ETA: {eta:}".format(
-        i=iter_num+1, x=args.arenaCompare, total=bar.elapsed_td, eta=bar.eta_td)
-    bar.next()
+# def AsyncAgainst(game, args, iter_num, bar):
+#     bar.suffix = "iter:{i}/{x} | Total: {total:} | ETA: {eta:}".format(
+#         i=iter_num+1, x=args.arenaCompare, total=bar.elapsed_td, eta=bar.eta_td)
+#     bar.next()
 
-    # set gpu
-    if(args.multiGPU):
-        if(iter_num % 2 == 0):
-            os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-        else:
-            os.environ["CUDA_VISIBLE_DEVICES"] = "1"
-    else:
-        os.environ["CUDA_VISIBLE_DEVICES"] = args.setGPU
+#     # set gpu
+#     if(args.multiGPU):
+#         if(iter_num % 2 == 0):
+#             os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+#         else:
+#             os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+#     else:
+#         os.environ["CUDA_VISIBLE_DEVICES"] = args.setGPU
 
-    # create nn and load
-    nnet = nn(game)
-    pnet = nn(game)
-    try:
-        nnet.load_checkpoint(folder=args.checkpoint, filename='train.pth.tar')
-    except:
-        print("load train model fail")
-        pass
-    try:
-        pnet.load_checkpoint(folder=args.checkpoint, filename='best.pth.tar')
-    except:
-        print("load old model fail")
-        pass
-    pmcts = MCTS(game, pnet, args)
-    nmcts = MCTS(game, nnet, args)
+#     # create nn and load
+#     nnet = nn(game)
+#     pnet = nn(game)
+#     try:
+#         nnet.load_checkpoint(folder=args.checkpoint, filename='train.pth.tar')
+#     except:
+#         print("load train model fail")
+#         pass
+#     try:
+#         pnet.load_checkpoint(folder=args.checkpoint, filename='best.pth.tar')
+#     except:
+#         print("load old model fail")
+#         pass
+#     pmcts = MCTS(game, pnet, args)
+#     nmcts = MCTS(game, nnet, args)
 
-    arena = Arena(lambda x: np.argmax(pmcts.getActionProb(x, temp=0)),
-                  lambda x: np.argmax(nmcts.getActionProb(x, temp=0)), game)
-    arena.displayBar = False
-    pwins, nwins, draws = arena.playGames(2)
-    return pwins, nwins, draws
+#     arena = Arena(lambda x: np.argmax(pmcts.getActionProb(x, temp=0)),
+#                   lambda x: np.argmax(nmcts.getActionProb(x, temp=0)), game)
+#     arena.displayBar = False
+#     pwins, nwins, draws = arena.playGames(2)
+#     return pwins, nwins, draws
 
 
-def CheckResultAndSaveNetwork(pwins, nwins, draws, game, args, iter_num):
-    # set gpu
-    os.environ["CUDA_VISIBLE_DEVICES"] = args.setGPU
+# def CheckResultAndSaveNetwork(pwins, nwins, draws, game, args, iter_num):
+#     # set gpu
+#     os.environ["CUDA_VISIBLE_DEVICES"] = args.setGPU
 
-    if pwins+nwins > 0 and float(nwins+(0.5*draws))/(pwins+nwins+draws) < args.updateThreshold:
-        print('REJECTING NEW MODEL')
-    else:
-        print('ACCEPTING NEW MODEL')
-        self.nnet = nn(game)
-        net.load_checkpoint(folder=args.checkpoint, filename='train.pth.tar')
-        net.save_checkpoint(folder=args.checkpoint, filename='best.pth.tar')
-        net.save_checkpoint(folder=args.checkpoint,
-                            filename='checkpoint_' + str(iter_num) + '.pth.tar')
+#     if pwins+nwins > 0 and float(nwins+(0.5*draws))/(pwins+nwins+draws) < args.updateThreshold:
+#         print('REJECTING NEW MODEL')
+#     else:
+#         print('ACCEPTING NEW MODEL')
+#         self.nnet = nn(game)
+#         net.load_checkpoint(folder=args.checkpoint, filename='train.pth.tar')
+#         net.save_checkpoint(folder=args.checkpoint, filename='best.pth.tar')
+#         net.save_checkpoint(folder=args.checkpoint,
+#                             filename='checkpoint_' + str(iter_num) + '.pth.tar')
 
 
 class Coach():
@@ -202,12 +205,13 @@ class Coach():
     def __init__(self, game, args):
         self.game = game
         self.args = args
-        self.nnet = nn(game)
+        self.nnet = nn(game, gpu_num=0)
+        self.nnet2 = nn(game, gpu_num=1)
         self.trainExamplesHistory = []
-        self.win_count = 0
-        self.loss_count = 0
-        self.draw_count = 0
         self.checkpoint_iter = 0
+        self.win_games = []
+        self.loss_games = []
+        self.draw_games = []
 
     # def parallel_self_play_process(self):
     #     processes = []
@@ -245,9 +249,12 @@ class Coach():
         # bar = Bar('Self Play', max=self.args.numEps)
         # bar = tqdm(total=self.args.numEps)
         for i in range(self.args.numEps):
-
+            if i % 2 == 0:
+                net = self.nnet
+            else:
+                net = self.nnet2
             res.append(pool.apply_async(AsyncSelfPlay, args=(
-                self.nnet, self.game, self.args, i, self.args.numEps)))  # , bar
+                net, self.game, self.args, i, self.args.numEps)))  # , bar
 
         pool.close()
         pool.join()
@@ -257,11 +264,11 @@ class Coach():
             gameplay, r = i.get()
             result.append(gameplay)
             if (r == 1e-4):
-                self.draw_count += 1
+                self.draw_games.append(gameplay)
             elif r == 1:
-                self.win_count += 1
+                self.win_games.append(gameplay)
             else:
-                self.loss_count += 1
+                self.loss_games.append(gameplay)
 
         for i in result:
             temp += i
@@ -316,6 +323,8 @@ class Coach():
             try:
                 self.nnet.load_checkpoint(
                     folder=self.args.checkpoint, filename='train.pth.tar')
+                self.nnet2.load_checkpoint(
+                    folder=self.args.checkpoint, filename='train.pth.tar')
                 print("Load old model")
 
             except:
@@ -329,6 +338,8 @@ class Coach():
                     #self.nnet = nn(self.game)
                     self.nnet.load_checkpoint(
                         folder=self.args.checkpoint, filename='train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
+                    self.nnet2.load_checkpoint(
+                        folder=self.args.checkpoint, filename='train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
                     print("Load Lastest model")
 
                 except Exception as e:
@@ -336,26 +347,41 @@ class Coach():
                     print('train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
                     print('No checkpoint iter')
 
-            self.win_count = 0
-            self.loss_count = 0
-            self.draw_count = 0
+            self.win_games = []
+            self.loss_games = []
+            self.draw_games = []
 
             iterationTrainExamples = deque([], maxlen=self.args.maxlenOfQueue)
+
             temp = self.parallel_self_play()
 
             iterationTrainExamples += temp
             # iterationTrainExamples = list(set(iterationTrainExamples))
 
-            print('Win count:', self.win_count, 'Loss count:',
-                  self.loss_count, 'Draw count:', self.draw_count)
+            print('Win count:', len(self.win_games), 'Loss count:',
+                  len(self.loss_games), 'Draw count:', len(self.draw_games))
 
-            if self.draw_count < 100:
-                self.checkpoint_iter = i
-                self.trainExamplesHistory.append(iterationTrainExamples)
-                self.train_network(i)
-                self.trainExamplesHistory.clear()
+            self.checkpoint_iter = i
+
+            games = []
+            games += self.win_games
+            games += self.loss_games
+
+            if len(self.draw_games) <= (len(self.win_games) + len(self.loss_games)):
+                games += self.draw_games
+                self.trainExamplesHistory.append(games)
+
             else:
-                print('Too much draw, no checkpoint created')
+                win_loss_count = len(self.win_games) + len(self.loss_games)
+                sample_draw_games = random.sample(
+                    self.draw_games, win_loss_count)
+                games += sample_draw_games
+                self.trainExamplesHistory.append(games)
+                print('Too much draw, add all win/loss games and ',
+                      str(win_loss_count), ' draw games')
+
+            self.train_network(i)
+            self.trainExamplesHistory.clear()
 
             # self.trainExamplesHistory.append(iterationTrainExamples)
             # self.train_network(i)

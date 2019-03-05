@@ -36,7 +36,8 @@ args = dotdict({
 
 
 class NNetWrapper(NeuralNet):
-    def __init__(self, game):
+    def __init__(self, game, gpu_num):
+        torch.cuda.set_device(f'cuda:{gpu_num}')
 
         self.game = game
         self.nnet = ResNet(game, block_filters=args.num_channels,

@@ -20,22 +20,22 @@ args = dotdict({
     'arenaCompare': 5,  # 400, 0
     'cpuct': 3,
 
-    'multiGPU': False,
+    'multiGPU': True,
     'setGPU': '0',
-    'numSelfPlayPool': 8,
+    'numSelfPlayPool': 20,
     'numTestPlayPool': 2,
 
-    'checkpoint': './temp/',
+    'checkpoint': '/workspace/CU_Makhos/models/',
     'load_model': False,
-    'load_folder_file': ('temp/', 'best.pth.tar'),
+    'load_folder_file': ('/workspace/CU_Makhos/models/', 'train_iter_1.pth.tar'),
     'numItersForTrainExamplesHistory': 20,
 
 })
 
 if __name__ == "__main__":
 
-    os.environ["CUDA_VISIBLE_DEVICES"] = "1"
-    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+    #os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+    #os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
     g = Game()
     c = Coach(g, args)
     # if args.load_model:
