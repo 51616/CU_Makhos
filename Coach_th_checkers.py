@@ -372,7 +372,7 @@ class Coach():
             games += self.win_games
             games += self.loss_games
 
-            self.draw_count <= (self.win_count + self.loss_count):
+            if self.draw_count <= (self.win_count + self.loss_count):
                 games += self.draw_games
                 self.trainExamplesHistory.append(games)
 
