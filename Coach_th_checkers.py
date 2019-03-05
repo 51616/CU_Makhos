@@ -209,6 +209,11 @@ class Coach():
         self.nnet2 = nn(game, gpu_num=1)
         self.trainExamplesHistory = []
         self.checkpoint_iter = 0
+
+        self.win_count = 0
+        self.loss_count = 0
+        self.draw_count = 0
+
         self.win_games = []
         self.loss_games = []
         self.draw_games = []
@@ -264,11 +269,11 @@ class Coach():
             gameplay, r = i.get()
             result.append(gameplay)
             if (r == 1e-4):
-                self.draw_games.append(gameplay)
+                self.draw_games += gameplay
             elif r == 1:
-                self.win_games.append(gameplay)
+                self.win_games += gameplay
             else:
-                self.loss_games.append(gameplay)
+                self.loss_games += gameplay
 
         for i in result:
             temp += i
@@ -335,7 +340,7 @@ class Coach():
 
             if i > 1:
                 try:
-                    #self.nnet = nn(self.game)
+                    # self.nnet = nn(self.game)
                     self.nnet.load_checkpoint(
                         folder=self.args.checkpoint, filename='train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
                     self.nnet2.load_checkpoint(
@@ -358,23 +363,25 @@ class Coach():
             iterationTrainExamples += temp
             # iterationTrainExamples = list(set(iterationTrainExamples))
 
-            print('Win count:', len(self.win_games), 'Loss count:',
-                  len(self.loss_games), 'Draw count:', len(self.draw_games))
+            print('Win count:', self.win_count, 'Loss count:',
+                  self.loss_count, 'Draw count:', self.draw_count
 
-            self.checkpoint_iter = i
+            self.checkpoint_iter=i
 
-            games = []
+            games=[]
             games += self.win_games
             games += self.loss_games
 
-            if len(self.draw_games) <= (len(self.win_games) + len(self.loss_games)):
+            self.draw_count <= (self.win_count + self.loss_count):
                 games += self.draw_games
                 self.trainExamplesHistory.append(games)
 
             else:
-                win_loss_count = len(self.win_games) + len(self.loss_games)
-                sample_draw_games = random.sample(
+                win_loss_count=self.win_count + self.loss_count
+
+                sample_draw_games=random.sample(
                     self.draw_games, win_loss_count)
+
                 games += sample_draw_games
                 self.trainExamplesHistory.append(games)
                 print('Too much draw, add all win/loss games and ',
