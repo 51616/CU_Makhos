@@ -100,10 +100,10 @@ class MCTS():
                 boardHistory, self.game.gameState.turn, self.game.gameState.stale, valids)
             print('Pi shape:', pi.shape)
             print(pi)
+            print(pi[0])
             pi = np.array(pi)
-            for p, i in enumerate(pi):
-                if p == 0:
-                    pi[i] = 1e-10
+            pi += EPS
+
             dir_noise = np.random.dirichlet(pi)
 
             self.Ps[s] = 0.75*pi + 0.25*dir_noise
