@@ -98,7 +98,7 @@ class MCTS():
             valids = self.game.getValidMoves(canonicalBoard, 1)
             pi, v = self.nnet.predict(
                 boardHistory, self.game.gameState.turn, self.game.gameState.stale, valids)
-            pi = np.array(pi[0])
+            pi = np.array(pi)
             for p, i in enumerate(pi):
                 if p == 0:
                     pi[i] = 1e-10
