@@ -222,6 +222,7 @@ class Coach():
         self.nnet1 = nn(game, gpu_num=1)
         self.nnet2 = nn(game, gpu_num=2)
         self.nnet3 = nn(game, gpu_num=3)
+
         self.trainExamplesHistory = []
         self.checkpoint_iter = 0
 
@@ -391,13 +392,10 @@ class Coach():
             #         print('train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
             #         print('No checkpoint iter')
 
-            # state_dict = copy.deepcopy(self.nnet.nnet.state_dict())
-            # self.nnet1.nnet.load_state_dict(state_dict)
-            # self.nnet1.nnet.share_memory()
-            # self.nnet2.nnet.load_state_dict(state_dict)
-            # self.nnet2.nnet.share_memory()
-            # self.nnet3.nnet.load_state_dict(state_dict)
-            # self.nnet3.nnet.share_memory()
+            state_dict = self.nnet.nnet.state_dict()
+            self.nnet1.nnet.load_state_dict(state_dict)
+            self.nnet2.nnet.load_state_dict(state_dict)
+            self.nnet3.nnet.load_state_dict(state_dict)
 
             self.win_count = 0
             self.loss_count = 0
@@ -426,7 +424,6 @@ class Coach():
 
             if self.draw_count <= (self.win_count + self.loss_count):
                 iterationTrainExamples += self.draw_games
-                self.trainExamplesHistory.append(iterationTrainExamples)
 
             else:
                 win_loss_count = len(self.win_games) + len(self.loss_games)
@@ -439,7 +436,6 @@ class Coach():
                       str(win_loss_count), ' draw moves')
 
             self.trainExamplesHistory.append(iterationTrainExamples)
-
             self.train_network(i)
             self.trainExamplesHistory.clear()
 
