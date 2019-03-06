@@ -193,14 +193,14 @@ class NNetWrapper(NeuralNet):
                     boards[i], turns[i], stales[i]))
 
             boards = torch.as_tensor(
-                np.array(stacked_board), dtype=torch.float32).cuda()
+                np.array(stacked_board), dtype=torch.float32).to(self.device)
 
             target_pis = torch.as_tensor(
-                np.array(pis), dtype=torch.float32).cuda()
+                np.array(pis), dtype=torch.float32).to(self.device)
             target_vs = torch.as_tensor(
-                np.array(vs), dtype=torch.float32).cuda()
+                np.array(vs), dtype=torch.float32).to(self.device)
             valids = torch.as_tensor(
-                np.array(valids), dtype=torch.float32).cuda()
+                np.array(valids), dtype=torch.float32).to(self.device)
 
             # compute output
 
