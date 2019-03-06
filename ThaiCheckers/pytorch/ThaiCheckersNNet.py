@@ -11,7 +11,7 @@ from utils import *
 import sys
 sys.path.append('..')
 
-TRACK = True
+TRACK = False
 
 
 class ThaiCheckersNNet(nn.Module):
