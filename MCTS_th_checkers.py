@@ -102,12 +102,13 @@ class MCTS():
 
             for p, i in enumerate(pi):
                 if p == 0:
-                    p[i] = 1e-10
+                    pi[i] = 1e-10
+
             self.Ps[s] = 0.75*pi + 0.25*dir_noise
 
             for p, i in enumerate(self.Ps[s]):
                 if p < 1e-5:
-                    p[i] = 0
+                    self.Ps[s][i] = 0
             # valids = self.game.getValidMoves(canonicalBoard, 1)
             # self.Ps[s] = self.Ps[s]*valids      # masking invalid moves
             sum_Ps_s = np.sum(self.Ps[s])
