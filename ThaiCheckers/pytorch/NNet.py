@@ -39,7 +39,7 @@ class NNetWrapper(NeuralNet):
     def __init__(self, game, gpu_num):
 
         self.gpu_num = gpu_num
-        os.environ["CUDA_VISIBLE_DEVICES"] = self.gpu_num
+        os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_num)
         self.device = f'cuda:{self.gpu_num}'
 
         torch.cuda.device(self.device)
