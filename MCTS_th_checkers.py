@@ -106,13 +106,17 @@ class MCTS():
             pi += EPS
             dir_noise = np.random.dirichlet(pi)
 
-            self.Ps[s] = 0.75*pi + 0.25*dir_noise
-            print(self.Ps[s])
-            print(self.Ps[s][0])
+            prob = 0.75*pi + 0.25*dir_noise
+            print(prob)
+            print(prob[0])
+            print(prob.shape)
 
-            for p, i in enumerate(self.Ps[s]):
-                if p < 1e-5:
-                    self.Ps[s][i] = 0
+            #self.Ps[s] = self.Ps[s][self.Ps[s] > 1e-5]
+            self.Ps[s] = [p if p > 1e-5 else 0 for p in prob]
+
+            # for p, i in enumerate(self.Ps[s]):
+            #     if p < 1e-5:
+            #         self.Ps[s][i] = 0
             # valids = self.game.getValidMoves(canonicalBoard, 1)
             # self.Ps[s] = self.Ps[s]*valids      # masking invalid moves
             sum_Ps_s = np.sum(self.Ps[s])
