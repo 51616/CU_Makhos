@@ -65,7 +65,7 @@ class NNetWrapper(NeuralNet):
         examples: list of examples, each example is of form (board, pi, v)
         """
         # self.nnet.train()
-        self.scheduler.step()
+        # self.scheduler.step()
         for epoch in range(args.epochs):
             examples = random.sample(past_examples, len(past_examples)//8)
             print('EPOCH ::: ' + str(epoch+1))

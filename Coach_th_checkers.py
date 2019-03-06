@@ -401,14 +401,14 @@ class Coach():
             self.nnet2.nnet.load_state_dict(self.nnet.nnet.state_dict())
             self.nnet3.nnet.load_state_dict(self.nnet.nnet.state_dict())
 
-            print('Check weights')
-            state_dict = self.nnet.nnet.policy.weight.data.cpu().numpy()
-            state_dict1 = self.nnet1.nnet.policy.weight.data.cpu().numpy()
-            print(state_dict == state_dict1)
-            state_dict2 = self.nnet2.nnet.policy.weight.data.cpu().numpy()
-            print(state_dict == state_dict2)
-            state_dict3 = self.nnet3.nnet.policy.weight.data.cpu().numpy()
-            print(state_dict == state_dict3)
+            # print('Check weights')
+            # state_dict = self.nnet.nnet.policy.weight.data.cpu().numpy()
+            # state_dict1 = self.nnet1.nnet.policy.weight.data.cpu().numpy()
+            # print(state_dict == state_dict1)
+            # state_dict2 = self.nnet2.nnet.policy.weight.data.cpu().numpy()
+            # print(state_dict == state_dict2)
+            # state_dict3 = self.nnet3.nnet.policy.weight.data.cpu().numpy()
+            # print(state_dict == state_dict3)
 
             self.win_count = 0
             self.loss_count = 0
