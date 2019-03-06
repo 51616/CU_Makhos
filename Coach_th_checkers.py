@@ -25,11 +25,13 @@ def AsyncSelfPlay(nnet, game, args, iter_num, iterr):  # , bar
     #     i=iter_num+1, x=iterr, total=bar.elapsed_td, eta=bar.eta_td)
 
     # #set gpu
-    if(args.multiGPU):
-        if(iter_num % 2 == 0):
-            torch.cuda.set_device('cuda:1')
-        else:
-            torch.cuda.set_device('cuda:2')
+    # if(args.multiGPU):
+    #     if(iter_num % 3 == 0):
+    #         torch.cuda.set_device('cuda:1')
+    #     elif (iter_num % 3 == 1):
+    #         torch.cuda.set_device('cuda:2')
+    #     else:
+    #         torch.cuda.set_device('cuda:3')
     # else:
     #     os.environ["CUDA_VISIBLE_DEVICES"] = args.setGPU
 
@@ -210,8 +212,9 @@ class Coach():
         self.game = game
         self.args = args
         self.nnet = nn(game, gpu_num=0)
-        self.nnet1 = nn(game, gpu_num=2)
-        self.nnet2 = nn(game, gpu_num=3)
+        self.nnet1 = nn(game, gpu_num=1)
+        self.nnet2 = nn(game, gpu_num=2)
+        self.nnet3 = nn(game, gpu_num=3)
         self.trainExamplesHistory = []
         self.checkpoint_iter = 0
 
@@ -263,10 +266,12 @@ class Coach():
         # bar = Bar('Self Play', max=self.args.numEps)
         # bar = tqdm(total=self.args.numEps)
         for i in range(self.args.numEps):
-            if i % 2 == 0:
+            if i % 3 == 0:
                 net = self.nnet1
-            else:
+            elif i % 3 == 1:
                 net = self.nnet2
+            else:
+                net = self.nnet3
 
             res.append(pool.apply_async(AsyncSelfPlay, args=(
                 net, self.game, self.args, i, self.args.numEps)))  # , bar
@@ -361,7 +366,10 @@ class Coach():
                 print("Create a new model")
 
         for i in range(1, self.args.numIters+1):
-            self.args.numMCTSSims += 1
+            if (self.args.numMCTSSims < 400):
+                self.args.numMCTSSims += 1
+            if ((i > 5) and (i % 2 == 0) and (self.args.numItersForTrainExamplesHistory < 20)):
+                self.args.numItersForTrainExamplesHistory += 1
             print('------ITER ' + str(i) + '------' +
                   '\tMCTS sim:' + str(self.args.numMCTSSims))
 
@@ -378,6 +386,7 @@ class Coach():
 
             self.nnet1.nnet.load_state_dict(self.nnet.nnet.state_dict())
             self.nnet2.nnet.load_state_dict(self.nnet.nnet.state_dict())
+            self.nnet3.nnet.load_state_dict(self.nnet.nnet.state_dict())
 
             self.win_count = 0
             self.loss_count = 0

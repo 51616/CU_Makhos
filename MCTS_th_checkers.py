@@ -30,7 +30,7 @@ class MCTS():
             probs: a policy vector where the probability of the ith action is
                    proportional to Nsa[(s,a)]**(1./temp)
         """
-        #print('len getprob:', len(boardHistory))  
+        #print('len getprob:', len(boardHistory))
         cur_move = self.game.gameState.turn
         cur_stale = self.game.gameState.stale
         for i in range(self.args.numMCTSSims):
@@ -98,6 +98,8 @@ class MCTS():
             valids = self.game.getValidMoves(canonicalBoard, 1)
             self.Ps[s], v = self.nnet.predict(
                 boardHistory, self.game.gameState.turn, self.game.gameState.stale, valids)
+            dir_noise = np.random.dirichlet((1, 1), 32*32)
+            self.Ps[s] += 0.75*dir_noise[0] + 0.25*dir_noise[1]
             # valids = self.game.getValidMoves(canonicalBoard, 1)
             # self.Ps[s] = self.Ps[s]*valids      # masking invalid moves
             sum_Ps_s = np.sum(self.Ps[s])
@@ -144,7 +146,7 @@ class MCTS():
         next_s = self.game.getCanonicalForm(next_s, next_player)
         newHistory = boardHistory.copy()
         newHistory.append(next_s)
-        
+
         v = self.search(newHistory)
 
         if (s, a) in self.Qsa:

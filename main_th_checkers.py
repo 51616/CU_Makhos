@@ -12,23 +12,23 @@ Before using multiprocessing, please check 2 things before use this script.
 
 args = dotdict({
     'numIters': 1000,
-    'numEps': 128,  # 25000
+    'numEps': 120,  # 25000
     'tempThreshold': 15,
     'updateThreshold': 0.55,
     'maxlenOfQueue': 200000,
-    'numMCTSSims': 400,  # 1600 , 800
+    'numMCTSSims': 100,  # 1600 , 800
     'arenaCompare': 5,  # 400, 0
     'cpuct': 3,
 
     'multiGPU': True,
     'setGPU': '0',
-    'numSelfPlayPool': 20,
+    'numSelfPlayPool': 30,
     'numTestPlayPool': 2,
 
     'checkpoint': '/workspace/CU_Makhos/models/',
     'load_model': False,
     'load_folder_file': ('/workspace/CU_Makhos/models/', 'train_iter_1.pth.tar'),
-    'numItersForTrainExamplesHistory': 20,
+    'numItersForTrainExamplesHistory': 4
 
 })
 
