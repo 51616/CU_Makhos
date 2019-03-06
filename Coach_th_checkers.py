@@ -391,9 +391,13 @@ class Coach():
             #         print('train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
             #         print('No checkpoint iter')
 
-            self.nnet1.nnet.load_state_dict(self.nnet.nnet.state_dict())
-            self.nnet2.nnet.load_state_dict(self.nnet.nnet.state_dict())
-            self.nnet3.nnet.load_state_dict(self.nnet.nnet.state_dict())
+            state_dict = copy.deepcopy(self.nnet.nnet.state_dict())
+            self.nnet1.nnet.load_state_dict(state_dict)
+            # self.nnet1.nnet.share_memory()
+            self.nnet2.nnet.load_state_dict(state_dict)
+            # self.nnet2.nnet.share_memory()
+            self.nnet3.nnet.load_state_dict(state_dict)
+            # self.nnet3.nnet.share_memory()
 
             self.win_count = 0
             self.loss_count = 0
