@@ -25,16 +25,19 @@ def AsyncSelfPlay(nnet, game, args, iter_num, iterr):  # , bar
     # bar.suffix = "iter:{i}/{x} | Total: {total:} | ETA: {eta:}".format(
     #     i=iter_num+1, x=iterr, total=bar.elapsed_td, eta=bar.eta_td)
 
-    # #set gpu
-    # if(args.multiGPU):
-    #     if(iter_num % 3 == 0):
-    #         torch.cuda.set_device('cuda:1')
-    #     elif (iter_num % 3 == 1):
-    #         torch.cuda.set_device('cuda:2')
-    #     else:
-    #         torch.cuda.set_device('cuda:3')
-    # else:
-    #     os.environ["CUDA_VISIBLE_DEVICES"] = args.setGPU
+    # set gpu
+    if(args.multiGPU):
+        if(iter_num % 3 == 0):
+            os.environ["CUDA_VISIBLE_DEVICES"] = 1
+            torch.cuda.set_device('cuda:1')
+        elif (iter_num % 3 == 1):
+            os.environ["CUDA_VISIBLE_DEVICES"] = 2
+            torch.cuda.set_device('cuda:2')
+        else:
+            os.environ["CUDA_VISIBLE_DEVICES"] = 3
+            torch.cuda.set_device('cuda:3')
+    else:
+        os.environ["CUDA_VISIBLE_DEVICES"] = args.setGPU
 
     # create nn and load
 
