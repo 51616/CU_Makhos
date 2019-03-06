@@ -356,7 +356,8 @@ class Coach():
                 # self.nnet1.load_state_dict(self.nnet.state_dict())
                 # self.nnet2.load_state_dict(self.nnet.state_dict())
 
-            except:
+            except Exception as e:
+                print(e)
                 print("Create a new model")
 
         for i in range(1, self.args.numIters+1):
