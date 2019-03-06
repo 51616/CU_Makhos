@@ -125,7 +125,9 @@ def TrainNetwork(nnet, game, args, iter_num, trainhistory):
     if len(trainhistory) > args.numItersForTrainExamplesHistory:
         print("len(trainExamplesHistory) =", len(trainhistory),
               " => remove the oldest trainExamples")
-        del trainhistory[len(trainhistory)-1]
+        #del trainhistory[len(trainhistory)-1]
+        trainhistory = trainhistory[:args.numItersForTrainExamplesHistory]
+        print('Length after remove:', len(trainhistory))
     # -------------------
     # ---extend history---
     trainExamples = []
@@ -137,7 +139,7 @@ def TrainNetwork(nnet, game, args, iter_num, trainhistory):
     if not os.path.exists(folder):
         os.makedirs(folder)
     filename = os.path.join(folder, 'trainhistory.pth.tar'+".examples")
-    with open(filename, "wb+") as f:
+    with open(filename, "wb") as f:
         Pickler(f).dump(trainhistory)
         # f.closed
     # ------------------
