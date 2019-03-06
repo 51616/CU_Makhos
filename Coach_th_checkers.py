@@ -401,9 +401,14 @@ class Coach():
             # self.nnet1.nnet.load_state_dict(state_dict)
             # self.nnet2.nnet.load_state_dict(state_dict)
             # self.nnet3.nnet.load_state_dict(state_dict)
-            print(self.nnet.nnet.state_dict() == self.nnet1.nnet.state_dict())
-            print(self.nnet.nnet.state_dict() == self.nnet2.nnet.state_dict())
-            print(self.nnet.nnet.state_dict() == self.nnet3.nnet.state_dict())
+
+            state_dict = self.nnet.nnet.state_dict()
+            state_dict1 = self.nnet1.nnet.state_dict()
+            print(state_dict == state_dict1)
+            state_dict2 = self.nnet2.nnet.state_dict()
+            print(state_dict == state_dict2)
+            state_dict3 = self.nnet3.nnet.state_dict()
+            print(state_dict == state_dict3)
 
             self.win_count = 0
             self.loss_count = 0
