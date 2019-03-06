@@ -107,8 +107,8 @@ class MCTS():
             dir_noise = np.random.dirichlet(pi)
 
             self.Ps[s] = 0.75*pi + 0.25*dir_noise
-            print(Ps[s])
-            print(Ps[s][0])
+            print(self.Ps[s])
+            print(self.Ps[s][0])
 
             for p, i in enumerate(self.Ps[s]):
                 if p < 1e-5:
