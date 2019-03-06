@@ -112,7 +112,7 @@ class MCTS():
             # print(prob.shape)
 
             #self.Ps[s] = self.Ps[s][self.Ps[s] > 1e-5]
-            self.Ps[s] = [p if p > 1e-5 else 0 for p in prob]
+            self.Ps[s] = [p if p > 1e-8 else 0 for p in prob]
 
             # for p, i in enumerate(self.Ps[s]):
             #     if p < 1e-5:
@@ -120,7 +120,7 @@ class MCTS():
             # valids = self.game.getValidMoves(canonicalBoard, 1)
             # self.Ps[s] = self.Ps[s]*valids      # masking invalid moves
             sum_Ps_s = np.sum(self.Ps[s])
-            print(sum_Ps_s)
+            # print(sum_Ps_s)
 
             # if sum_Ps_s > 0:
             #     self.Ps[s] /= sum_Ps_s    # renormalize
