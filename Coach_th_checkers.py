@@ -9,6 +9,7 @@ import time
 import os
 import sys
 from pickle import Pickler, Unpickler
+import pickle
 from random import shuffle
 from torch import multiprocessing
 import torch
@@ -115,12 +116,12 @@ def TrainNetwork(nnet, game, args, iter_num, trainhistory):
     modelFile = os.path.join(args.checkpoint, "trainhistory.pth.tar")
     examplesFile = modelFile+".examples"
     if not os.path.isfile(examplesFile):
-        print(examplesFile)
+        print('Train history not found')
     else:
         # print("File with trainExamples found. Read it.")
-        with open(examplesFile, "rb") as f:
-            for i in Unpickler(f).load():
-                trainhistory.append(i)
+        old_history = pickle.load(open(examplesFile, "rb"))
+        for iter_samples in old_history:
+            trainhistory.append(iter_samples)
         # f.closed
     # ----------------------
     # ---delete if over limit---
@@ -136,14 +137,17 @@ def TrainNetwork(nnet, game, args, iter_num, trainhistory):
     for e in trainhistory:
         trainExamples.extend(e)
     shuffle(trainExamples)
+    print('Total train samples (moves):', len(trainExamples))
     # ---save history---
     folder = args.checkpoint
     if not os.path.exists(folder):
         os.makedirs(folder)
     filename = os.path.join(folder, 'trainhistory.pth.tar'+".examples")
-    with open(filename, "wb") as f:
-        Pickler(f).dump(trainhistory)
-        # f.closed
+    pickle.dump(trainhistory, open(filename, "wb"))
+
+    # with open(filename, "wb") as f:
+    #     Pickler(f).dump(trainhistory)
+    #     # f.closed
     # ------------------
     nnet.train(trainExamples)
     nnet.save_checkpoint(folder=args.checkpoint,
