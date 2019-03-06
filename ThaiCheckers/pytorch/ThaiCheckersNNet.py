@@ -19,6 +19,7 @@ class ThaiCheckersNNet(nn.Module):
         self.action_size = game.getActionSize()
         self.input_channels = 34
         self.args = args
+        self.track_running_stats = True
 
         super(ThaiCheckersNNet, self).__init__()
         self.conv1 = nn.Conv2d(self.input_channels,
@@ -87,10 +88,12 @@ class ResBlock(nn.Module):
 
         self.conv1 = nn.Conv2d(
             filters, filters, kernel_size=kernel, padding=pad)
-        self.bn1 = nn.BatchNorm2d(filters) #, track_running_stats=False)
+        self.bn1 = nn.BatchNorm2d(
+            filters, track_running_stats=self.track_running_stats)
         self.conv2 = nn.Conv2d(
             filters, filters, kernel_size=kernel, padding=pad)
-        self.bn2 = nn.BatchNorm2d(filters) #, track_running_stats=False)
+        self.bn2 = nn.BatchNorm2d(
+            filters, track_running_stats=self.track_running_stats)
 
     def forward(self, x):
         inp = x
@@ -130,7 +133,8 @@ class ResNet(nn.Module):
         # the starting conv block
         self.conv_block = nn.Conv2d(
             self.board_size[0], block_filters, kernel_size=block_kernel, stride=1, padding=pad)
-        self.conv_block_bn = nn.BatchNorm2d(block_filters) #, track_running_stats=False)
+        self.conv_block_bn = nn.BatchNorm2d(
+            block_filters, track_running_stats=self.track_running_stats)
 
         # the residual blocks
         self.blocks = blocks
@@ -140,7 +144,8 @@ class ResNet(nn.Module):
         # policy head
         self.policy_conv = nn.Conv2d(
             block_filters, policy_filters, kernel_size=1)
-        self.policy_conv_bn = nn.BatchNorm2d(policy_filters) #, track_running_stats=False)
+        self.policy_conv_bn = nn.BatchNorm2d(
+            policy_filters, track_running_stats=self.track_running_stats)
         # calculate policy output shape to flatten
         pol_shape = (policy_filters, self.board_size[1], self.board_size[2])
         self.policy_flat = int(np.prod(pol_shape))
@@ -152,7 +157,8 @@ class ResNet(nn.Module):
         # value head
         self.value_conv = nn.Conv2d(
             block_filters, value_filters, kernel_size=1)
-        self.value_conv_bn = nn.BatchNorm2d(value_filters) # , track_running_stats=False)
+        self.value_conv_bn = nn.BatchNorm2d(
+            value_filters, track_running_stats=self.track_running_stats)
         # calculate value shape to flatten
         val_shape = (value_filters, self.board_size[1], self.board_size[2])
         self.value_flat = int(np.prod(val_shape))
