@@ -258,7 +258,7 @@ class NNetWrapper(NeuralNet):
         # , map_location=torch.device('cuda')
         checkpoint = torch.load(filepath)
 
-        self.nnet.load_state_dict(checkpoint['state_dict'])
+        self.nnet.load_state_dict(checkpoint['state_dict'], strict=False)
         # self.nnet.to(self.device).eval()
         # self.nnet.share_memory()
 
