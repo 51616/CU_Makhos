@@ -64,7 +64,7 @@ class NNetWrapper(NeuralNet):
         """
         examples: list of examples, each example is of form (board, pi, v)
         """
-        self.nnet.train()
+        # self.nnet.train()
         self.scheduler.step()
         for epoch in range(args.epochs):
             examples = random.sample(past_examples, len(past_examples)//8)
@@ -163,7 +163,7 @@ class NNetWrapper(NeuralNet):
         val_pi_loss = 0
         val_v_loss = 0
 
-        self.nnet.eval()
+        # self.nnet.eval()
 
         val_examples = random.sample(past_examples, len(past_examples)//2)
 
