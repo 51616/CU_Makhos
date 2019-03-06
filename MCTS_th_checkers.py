@@ -98,15 +98,17 @@ class MCTS():
             valids = self.game.getValidMoves(canonicalBoard, 1)
             pi, v = self.nnet.predict(
                 boardHistory, self.game.gameState.turn, self.game.gameState.stale, valids)
-            print('Pi shape:', pi.shape)
-            print(pi)
-            print(pi[0])
-            pi = np.array(pi)
-            pi += EPS
+            # print('Pi shape:', pi.shape)
+            # print(pi)
+            # print(pi[0])
+            # pi = np.array(pi)
 
+            pi += EPS
             dir_noise = np.random.dirichlet(pi)
 
             self.Ps[s] = 0.75*pi + 0.25*dir_noise
+            print(Ps[s])
+            print(Ps[s][0])
 
             for p, i in enumerate(self.Ps[s]):
                 if p < 1e-5:
