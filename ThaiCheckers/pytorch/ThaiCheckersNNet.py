@@ -149,7 +149,7 @@ class ResNet(nn.Module):
         # policy layers
         # self.policy_bn = nn.BatchNorm1d(num_features=policy_filters,track_running_stats=False)
         self.policy = nn.Linear(self.policy_flat, self.action_size)
-        self.policy_softmax = torch.nn.Softmax(dim=1)
+        self.policy_softmax = torch.nn.Softmax()
 
         # value head
         self.value_conv = nn.Conv2d(
@@ -179,8 +179,8 @@ class ResNet(nn.Module):
         x_pi = F.relu(x_pi)
         x_pi = self.policy(x_pi)
         x_pi -= (1-valids)*1000
-        x_pi = self.policy_softmax(x_pi).reshape(
-            self.action_size)  # torch.log_softmax(x_pi, dim=1)
+        # .reshape(self.action_size)  # torch.log_softmax(x_pi, dim=1)
+        x_pi = self.policy_softmax(x_pi)
 
         # value head
         x_v = self.value_conv(x)
