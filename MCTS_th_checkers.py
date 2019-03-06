@@ -96,7 +96,7 @@ class MCTS():
         if s not in self.Ps:
             # leaf node
             valids = self.game.getValidMoves(canonicalBoard, 1)
-            self.Ps[s], v = self.nnet.predict(
+            pi, v = self.nnet.predict(
                 boardHistory, self.game.gameState.turn, self.game.gameState.stale, valids)
 
             pi += EPS
