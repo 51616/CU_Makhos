@@ -107,9 +107,9 @@ class MCTS():
             dir_noise = np.random.dirichlet(pi)
 
             prob = 0.75*pi + 0.25*dir_noise
-            print(prob)
-            print(prob[0])
-            print(prob.shape)
+            # print(prob)
+            # print(prob[0])
+            # print(prob.shape)
 
             #self.Ps[s] = self.Ps[s][self.Ps[s] > 1e-5]
             self.Ps[s] = [p if p > 1e-5 else 0 for p in prob]
@@ -120,6 +120,8 @@ class MCTS():
             # valids = self.game.getValidMoves(canonicalBoard, 1)
             # self.Ps[s] = self.Ps[s]*valids      # masking invalid moves
             sum_Ps_s = np.sum(self.Ps[s])
+            print(sum_Ps_s)
+
             # if sum_Ps_s > 0:
             #     self.Ps[s] /= sum_Ps_s    # renormalize
             if sum_Ps_s <= 0:
