@@ -45,7 +45,7 @@ class NNetWrapper(NeuralNet):
 
         self.game = game
         self.nnet = ResNet(game, block_filters=args.num_channels,
-                           block_kernel=3, blocks=args.num_blocks).to(self.device).eval()
+                           block_kernel=3, blocks=args.num_blocks).to(self.device, non_blocking=True).eval()
 
         self.board_x, self.board_y = game.getBoardSize()
         self.action_size = game.getActionSize()
@@ -222,8 +222,10 @@ class NNetWrapper(NeuralNet):
 
         board = self.convertToModelInput(board, turn, stale)
         # preparing input
-        board = torch.as_tensor(board, dtype=torch.float32).to(self.device)
-        valids = torch.as_tensor(valids, dtype=torch.float32).to(self.device)
+        board = torch.as_tensor(board, dtype=torch.float32).to(
+            self.device, non_blocking=True)
+        valids = torch.as_tensor(valids, dtype=torch.float32).to(
+            self.device, non_blocking=True)
         # self.nnet.eval()
         pi, v = self.nnet((board, valids))
 
