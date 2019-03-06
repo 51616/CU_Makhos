@@ -96,23 +96,15 @@ class MCTS():
         if s not in self.Ps:
             # leaf node
             valids = self.game.getValidMoves(canonicalBoard, 1)
-            pi, v = self.nnet.predict(
+            self.Ps[s], v = self.nnet.predict(
                 boardHistory, self.game.gameState.turn, self.game.gameState.stale, valids)
-            # print('Pi shape:', pi.shape)
-            # print(pi)
-            # print(pi[0])
-            # pi = np.array(pi)
 
-            pi += EPS
-            dir_noise = np.random.dirichlet(pi)
-
-            prob = 0.75*pi + 0.25*dir_noise
-            # print(prob)
-            # print(prob[0])
-            # print(prob.shape)
+            #pi += EPS
+            #dir_noise = np.random.dirichlet(pi)
+            #prob = 0.75*pi + 0.25*dir_noise
 
             #self.Ps[s] = self.Ps[s][self.Ps[s] > 1e-5]
-            self.Ps[s] = [p if p > 1e-8 else 0 for p in prob]
+            #self.Ps[s] = [p if p > 1e-8 else 0 for p in prob]
 
             # for p, i in enumerate(self.Ps[s]):
             #     if p < 1e-5:
