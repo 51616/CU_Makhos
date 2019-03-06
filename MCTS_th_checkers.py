@@ -98,6 +98,8 @@ class MCTS():
             valids = self.game.getValidMoves(canonicalBoard, 1)
             pi, v = self.nnet.predict(
                 boardHistory, self.game.gameState.turn, self.game.gameState.stale, valids)
+            print('Pi shape:', pi.shape)
+            print(pi)
             pi = np.array(pi)
             for p, i in enumerate(pi):
                 if p == 0:
