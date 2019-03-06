@@ -178,7 +178,7 @@ class ResNet(nn.Module):
         x_pi = F.relu(x_pi)
         x_pi = self.policy(x_pi)
         x_pi -= (1-valids)*1000
-        x_pi = torch.log_softmax(x_pi, dim=1)
+        x_pi = torch.nn.Softmax(x_pi)  # torch.log_softmax(x_pi, dim=1)
 
         # value head
         x_v = self.value_conv(x)
