@@ -223,6 +223,11 @@ class Coach():
         self.nnet2 = nn(game, gpu_num=2)
         self.nnet3 = nn(game, gpu_num=3)
 
+        state_dict = self.nnet.nnet.state_dict()
+        self.nnet1.nnet.load_state_dict(state_dict)
+        self.nnet2.nnet.load_state_dict(state_dict)
+        self.nnet3.nnet.load_state_dict(state_dict)
+
         self.trainExamplesHistory = []
         self.checkpoint_iter = 0
 
@@ -392,10 +397,13 @@ class Coach():
             #         print('train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
             #         print('No checkpoint iter')
 
-            state_dict = self.nnet.nnet.state_dict()
-            self.nnet1.nnet.load_state_dict(state_dict)
-            self.nnet2.nnet.load_state_dict(state_dict)
-            self.nnet3.nnet.load_state_dict(state_dict)
+            # state_dict = self.nnet.nnet.state_dict()
+            # self.nnet1.nnet.load_state_dict(state_dict)
+            # self.nnet2.nnet.load_state_dict(state_dict)
+            # self.nnet3.nnet.load_state_dict(state_dict)
+            print(self.nnet.nnet.state_dict() == self.nnet1.nnet.state_dict())
+            print(self.nnet.nnet.state_dict() == self.nnet2.nnet.state_dict())
+            print(self.nnet.nnet.state_dict() == self.nnet3.nnet.state_dict())
 
             self.win_count = 0
             self.loss_count = 0
