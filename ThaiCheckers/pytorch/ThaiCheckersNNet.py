@@ -145,7 +145,7 @@ class ResNet(nn.Module):
             policy_filters, track_running_stats=False)
         # calculate policy output shape to flatten
         pol_shape = (policy_filters, self.board_size[1], self.board_size[2])
-        # self.policy_flat = int(np.prod(pol_shape))
+        self.policy_flat = int(np.prod(pol_shape))
         # policy layers
         # self.policy_bn = nn.BatchNorm1d(num_features=policy_filters,track_running_stats=False)
         self.policy = nn.Linear(self.policy_flat, self.action_size)
@@ -157,7 +157,7 @@ class ResNet(nn.Module):
             value_filters, track_running_stats=False)
         # calculate value shape to flatten
         val_shape = (value_filters, self.board_size[1], self.board_size[2])
-        # self.value_flat = int(np.prod(val_shape))
+        self.value_flat = int(np.prod(val_shape))
         # value layers
         self.value_hidden = nn.Linear(self.value_flat, value_hidden)
         self.value = nn.Linear(value_hidden, 1)
