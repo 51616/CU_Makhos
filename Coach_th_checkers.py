@@ -352,7 +352,7 @@ class Coach():
         if self.args.load_model:
             try:
                 self.nnet.load_checkpoint(
-                    folder=self.args.checkpoint, filename='train_iter_1.pth.tar')
+                    folder=self.args.checkpoint, filename=self.args.load_folder_file[1])
                 # self.nnet1.load_state_dict(self.nnet.state_dict())
                 # self.nnet2.load_state_dict(self.nnet.state_dict())
 
