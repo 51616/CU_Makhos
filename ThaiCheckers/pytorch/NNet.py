@@ -78,7 +78,7 @@ class NNetWrapper(NeuralNet):
 
             # bar = Bar('Training Net', max=int(len(examples)/args.batch_size)+1)
             number_of_batches = int(math.ceil(len(examples)/args.batch_size))
-            bar = tqdm(total=number_of_batches)
+            #bar = tqdm(total=number_of_batches)
             batch_idx = 0
 
             train_pi_loss = 0
@@ -142,7 +142,7 @@ class NNetWrapper(NeuralNet):
                 batch_idx += 1
 
                 # plot progress
-                bar.update(1)
+                # bar.update(1)
             #     bar.suffix = '({batch}/{size}) Data: {data:.3f}s | Batch: {bt:.3f}s | Total: {total:} | ETA: {eta:} | Loss_pi: {lpi:.4f} | Loss_v: {lv:.3f}'.format(
             #         batch=batch_idx,
             #         size=int(len(examples)/args.batch_size)+1,
@@ -155,7 +155,7 @@ class NNetWrapper(NeuralNet):
             #     )
             #     bar.next()
             # bar.finish()
-            bar.close()
+            # bar.close()
             print('Training Pi loss:', train_pi_loss/number_of_batches,
                   'Training V loss:', train_v_loss/number_of_batches)
 
@@ -261,7 +261,7 @@ class NNetWrapper(NeuralNet):
         # , map_location=torch.device('cuda')
         checkpoint = torch.load(filepath)
 
-        self.nnet.load_state_dict(checkpoint['state_dict'], strict=False)
+        self.nnet.load_state_dict(checkpoint['state_dict'])
         # self.nnet.to(self.device).eval()
         # self.nnet.share_memory()
 

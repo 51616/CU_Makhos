@@ -397,10 +397,10 @@ class Coach():
             #         print('train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
             #         print('No checkpoint iter')
 
-            # state_dict = self.nnet.nnet.state_dict()
-            # self.nnet1.nnet.load_state_dict(state_dict)
-            # self.nnet2.nnet.load_state_dict(state_dict)
-            # self.nnet3.nnet.load_state_dict(state_dict)
+            self.nnet1.nnet.load_state_dict(self.nnet.nnet.state_dict())
+            self.nnet2.nnet.load_state_dict(self.nnet.nnet.state_dict())
+            self.nnet3.nnet.load_state_dict(self.nnet.nnet.state_dict())
+
             print('Check weights')
             state_dict = self.nnet.nnet.policy.weight.data.cpu().numpy()
             state_dict1 = self.nnet1.nnet.policy.weight.data.cpu().numpy()
