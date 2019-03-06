@@ -401,7 +401,7 @@ class Coach():
             # self.nnet1.nnet.load_state_dict(state_dict)
             # self.nnet2.nnet.load_state_dict(state_dict)
             # self.nnet3.nnet.load_state_dict(state_dict)
-
+            print('Check weights')
             state_dict = self.nnet.nnet.weight.data.cpu().numpy()
             state_dict1 = self.nnet1.nnet.weight.data.cpu().numpy()
             print(state_dict == state_dict1)
