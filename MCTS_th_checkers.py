@@ -99,12 +99,11 @@ class MCTS():
             self.Ps[s], v = self.nnet.predict(
                 boardHistory, self.game.gameState.turn, self.game.gameState.stale, valids)
 
-            #pi += EPS
-            #dir_noise = np.random.dirichlet(pi)
-            #prob = 0.75*pi + 0.25*dir_noise
+            pi += EPS
+            dir_noise = np.random.dirichlet(pi)
+            prob = 0.75*pi + 0.25*dir_noise
 
-            #self.Ps[s] = self.Ps[s][self.Ps[s] > 1e-5]
-            #self.Ps[s] = [p if p > 1e-8 else 0 for p in prob]
+            self.Ps[s] = [p if p > 1e-8 else 0 for p in prob]
 
             # for p, i in enumerate(self.Ps[s]):
             #     if p < 1e-5:
