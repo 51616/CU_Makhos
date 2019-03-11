@@ -370,7 +370,7 @@ class Coach():
         if self.args.load_model:
             try:
                 self.nnet.load_checkpoint(
-                    folder=self.args.checkpoint, filename=self.args.load_folder_file[1])
+                    folder=self.args.checkpoint, filename='train_iter_'+str(self.args.load_iter)+'.pth.tar')
                 # self.nnet1.load_state_dict(self.nnet.state_dict())
                 # self.nnet2.load_state_dict(self.nnet.state_dict())
 
@@ -378,7 +378,7 @@ class Coach():
                 print(e)
                 print("Create a new model")
 
-        for i in range(1, self.args.numIters+1):
+        for i in range(self.args.start_iter, self.args.numIters+1):
             if (self.args.numMCTSSims < 400):
                 self.args.numMCTSSims += 1
             if ((i > 5) and (i % 2 == 0) and (self.args.numItersForTrainExamplesHistory < 20)):

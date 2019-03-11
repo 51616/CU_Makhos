@@ -26,8 +26,10 @@ args = dotdict({
     'numTestPlayPool': 2,
 
     'checkpoint': '/workspace/CU_Makhos/models/',
-    'load_model': False,
-    'load_folder_file': ('/workspace/CU_Makhos/models/', 'train_iter_1.pth.tar'),
+    'load_model': True,
+    'load_iter': 160,
+    'start_iter': 161,
+    'load_folder_file': '/workspace/CU_Makhos/models/',
     'numItersForTrainExamplesHistory': 4
 
 })
