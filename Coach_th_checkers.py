@@ -384,7 +384,7 @@ class Coach():
             if ((i > 5) and (i % 2 == 0) and (self.args.numItersForTrainExamplesHistory < 20)):
                 self.args.numItersForTrainExamplesHistory += 1
             print('------ITER ' + str(i) + '------' +
-                  '\tMCTS sim:' + str(self.args.numMCTSSims))
+                  '\tMCTS sim:' + str(self.args.numMCTSSims) + '\tIter samples :' + str(self.args.numItersForTrainExamplesHistory))
 
             # if i > 1:
             #     try:

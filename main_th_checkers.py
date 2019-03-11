@@ -16,7 +16,7 @@ args = dotdict({
     'tempThreshold': 15,
     'updateThreshold': 0.55,
     'maxlenOfQueue': 200000,
-    'numMCTSSims': 100,  # 1600 , 800
+    'numMCTSSims': 100 + 160,  # 1600 , 800
     'arenaCompare': 5,  # 400, 0
     'cpuct': 3,
 
@@ -30,7 +30,7 @@ args = dotdict({
     'load_iter': 160,
     'start_iter': 161,
     'load_folder_file': '/workspace/CU_Makhos/models/',
-    'numItersForTrainExamplesHistory': 4
+    'numItersForTrainExamplesHistory': 4 + 16
 
 })
 
