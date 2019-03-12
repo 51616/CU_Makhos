@@ -26,7 +26,7 @@ args = dotdict({
     'lr': 0.02,
     'dropout': 0.3,
     'epochs': 2,
-    'batch_size': 1024,  # 4096
+    'batch_size': 256,  # 4096
     'cuda': torch.cuda.is_available(),
     'num_channels': 128,  # 256
     'num_blocks': 20
@@ -52,7 +52,7 @@ class NNetWrapper(NeuralNet):
         self.optimizer = optim.Adam(
             self.nnet.parameters(), lr=args.lr, weight_decay=0.0001)
         self.scheduler = torch.optim.lr_scheduler.MultiStepLR(
-            self.optimizer, milestones=[50, 150, 200, 250, 300], gamma=0.5)
+            self.optimizer, milestones=[100, 150, 200, 250, 300], gamma=0.5)
         self.min_batch_size = 100
         # if args.cuda:
         #     self.nnet.cuda()
@@ -68,7 +68,8 @@ class NNetWrapper(NeuralNet):
         self.scheduler.step()
         # self.nnet.train()
         for epoch in range(args.epochs):
-            examples = random.sample(past_examples, len(past_examples)//8)
+            # random.sample(past_examples, len(past_examples)//8)
+            examples = past_examples
             print('EPOCH ::: ' + str(epoch+1))
 
             # data_time = AverageMeter()
