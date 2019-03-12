@@ -17,6 +17,7 @@ import torch
 from tqdm import tqdm
 import random
 import copy
+from .utils_examples_global_avg import build_unique_examples
 
 mp = multiprocessing.get_context('spawn')
 
@@ -169,8 +170,10 @@ def TrainNetwork(nnet, game, args, iter_num, trainhistory):
         print('Length after remove:', len(trainhistory))
     # -------------------
     # ---extend history---
+    unique_train_history = build_unique_examples(trainhistory)
+
     trainExamples = []
-    for e in trainhistory:
+    for e in unique_train_history:
         trainExamples.extend(e)
     shuffle(trainExamples)
     print('Total train samples (moves):', len(trainExamples))
@@ -191,56 +194,56 @@ def TrainNetwork(nnet, game, args, iter_num, trainhistory):
                          filename='train_iter_' + str(iter_num) + '.pth.tar')
 
 
-# def AsyncAgainst(game, args, iter_num, bar):
-#     bar.suffix = "iter:{i}/{x} | Total: {total:} | ETA: {eta:}".format(
-#         i=iter_num+1, x=args.arenaCompare, total=bar.elapsed_td, eta=bar.eta_td)
-#     bar.next()
+def AsyncAgainst(nnet, game, args, iter_num):
 
-#     # set gpu
-#     if(args.multiGPU):
-#         if(iter_num % 2 == 0):
-#             os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-#         else:
-#             os.environ["CUDA_VISIBLE_DEVICES"] = "1"
-#     else:
-#         os.environ["CUDA_VISIBLE_DEVICES"] = args.setGPU
+    # set gpu
+    if(args.multiGPU):
+        if(iter_num % 3 == 0):
+            #os.environ["CUDA_VISIBLE_DEVICES"] = '1'
+            torch.cuda.device('cuda:1')
+        elif (iter_num % 3 == 1):
+            #os.environ["CUDA_VISIBLE_DEVICES"] = '2'
+            torch.cuda.device('cuda:2')
+        else:
+            #os.environ["CUDA_VISIBLE_DEVICES"] = '3'
+            torch.cuda.device('cuda:3')
+    else:
+        os.environ["CUDA_VISIBLE_DEVICES"] = args.setGPU
 
-#     # create nn and load
-#     nnet = nn(game)
-#     pnet = nn(game)
-#     try:
-#         nnet.load_checkpoint(folder=args.checkpoint, filename='train.pth.tar')
-#     except:
-#         print("load train model fail")
-#         pass
-#     try:
-#         pnet.load_checkpoint(folder=args.checkpoint, filename='best.pth.tar')
-#     except:
-#         print("load old model fail")
-#         pass
-#     pmcts = MCTS(game, pnet, args)
-#     nmcts = MCTS(game, nnet, args)
+    # create nn and load
+    minimax = minimaxAI(game)
+    try:
+        nnet.load_checkpoint(folder=args.checkpoint,
+                             filename='train_iter_'+str(iter_num)+'.pth.tar')
+    except:
+        print("load train model fail")
+        pass
+    try:
+        pnet.load_checkpoint(folder=args.checkpoint, filename='best.pth.tar')
+    except:
+        print("load old model fail")
+        pass
 
-#     arena = Arena(lambda x: np.argmax(pmcts.getActionProb(x, temp=0)),
-#                   lambda x: np.argmax(nmcts.getActionProb(x, temp=0)), game)
-#     arena.displayBar = False
-#     pwins, nwins, draws = arena.playGames(2)
-#     return pwins, nwins, draws
+    mcts = MCTS(game, nnet, args, eval=True)
+
+    arena = Arena(lambda x: np.argmax(mcts.getActionProb(x, temp=0)),
+                  minimax.get_move, game)
+    arena.displayBar = False
+    net_win, minimax_win, draws = arena.playGames(2)
+    return net_win, minimax_win, draws
 
 
-# def CheckResultAndSaveNetwork(pwins, nwins, draws, game, args, iter_num):
-#     # set gpu
-#     os.environ["CUDA_VISIBLE_DEVICES"] = args.setGPU
+# def CheckResultAndSaveNetwork(pwins, nwins, draws, nnet, game, args, iter_num):
 
 #     if pwins+nwins > 0 and float(nwins+(0.5*draws))/(pwins+nwins+draws) < args.updateThreshold:
 #         print('REJECTING NEW MODEL')
 #     else:
 #         print('ACCEPTING NEW MODEL')
-#         self.nnet = nn(game)
-#         net.load_checkpoint(folder=args.checkpoint, filename='train.pth.tar')
-#         net.save_checkpoint(folder=args.checkpoint, filename='best.pth.tar')
-#         net.save_checkpoint(folder=args.checkpoint,
-#                             filename='checkpoint_' + str(iter_num) + '.pth.tar')
+#         nnet.load_checkpoint(folder=args.checkpoint,
+#                              filename='train_iter_'+str(iter_num)+'.pth.tar')
+#         nnet.save_checkpoint(folder=args.checkpoint, filename='best.pth.tar')
+#         nnet.save_checkpoint(folder=args.checkpoint,
+#                              filename='checkpoint_' + str(iter_num) + '.pth.tar')
 
 
 class Coach():
@@ -253,11 +256,14 @@ class Coach():
         self.game = game
         self.args = args
         self.nnet = nn(game, gpu_num=0)
+        self.nnet1 = nn(self.game, gpu_num=1)
+        self.nnet2 = nn(self.game, gpu_num=2)
+        self.nnet3 = nn(self.game, gpu_num=3)
 
-        # state_dict = self.nnet.nnet.state_dict()
-        # self.nnet1.nnet.load_state_dict(state_dict)
-        # self.nnet2.nnet.load_state_dict(state_dict)
-        # self.nnet3.nnet.load_state_dict(state_dict)
+        state_dict = self.nnet.nnet.state_dict()
+        self.nnet1.nnet.load_state_dict(state_dict)
+        self.nnet2.nnet.load_state_dict(state_dict)
+        self.nnet3.nnet.load_state_dict(state_dict)
 
         self.trainExamplesHistory = []
         self.checkpoint_iter = 0
@@ -366,6 +372,46 @@ class Coach():
             self.loss_games += i
         return temp
 
+    def parallel_self_test_play(self, iter_num):
+        pool = mp.Pool(processes=self.args.numTestPlayPool)
+
+        res = []
+        result = []
+        for i in range(self.args.arenaCompare):
+            if i % 3 == 0:
+                net = self.nnet1
+            elif i % 3 == 1:
+                net = self.nnet2
+            else:
+                net = self.nnet3
+
+            res.append(pool.apply_async(
+                AsyncAgainst, args=(net, self.game, self.args, i)))
+        pool.close()
+        pool.join()
+
+        pwins = 0
+        nwins = 0
+        draws = 0
+        for i in res:
+            result.append(i.get())
+        for i in result:
+            pwins += i[0]
+            nwins += i[1]
+            draws += i[2]
+
+        print("NN win: "+str(pwins)+"\tMinimax win: " +
+              str(nwins)+"\tDraws: "+str(draws))
+        # pool = mp.Pool(processes=1)
+
+        # pool.apply_async(CheckResultAndSaveNetwork, args=(
+        #     pwins, nwins, draws, self.game, self.args, iter_num,))
+        # pool.close()
+        # pool.join()
+
+        # CheckResultAndSaveNetwork(
+        #     pwins, nwins, draws, self.nnet, self.game, self.args, iter_num)
+
     def train_network(self, iter_num):
 
         # print("Start train network")
@@ -375,38 +421,6 @@ class Coach():
         TrainNetwork(self.nnet, self.game, self.args,
                      iter_num, self.trainExamplesHistory)
 
-    # def parallel_self_test_play(self, iter_num):
-    #     mp = multiprocessing.get_context('forkserver')
-    #     pool = mp.Pool(processes=self.args.numTestPlayPool)
-    #     print("Start test play")
-    #     bar = Bar('Test Play', max=self.args.arenaCompare)
-    #     res = []
-    #     result = []
-    #     for i in range(self.args.arenaCompare):
-    #         res.append(pool.apply_async(
-    #             AsyncAgainst, args=(self.game, self.args, i, bar)))
-    #     pool.close()
-    #     pool.join()
-
-    #     pwins = 0
-    #     nwins = 0
-    #     draws = 0
-    #     for i in res:
-    #         result.append(i.get())
-    #     for i in result:
-    #         pwins += i[0]
-    #         nwins += i[1]
-    #         draws += i[2]
-
-    #     print("pwin: "+str(pwins))
-    #     print("nwin: "+str(nwins))
-    #     print("draw: "+str(draws))
-    #     pool = mp.Pool(processes=1)
-    #     pool.apply_async(CheckResultAndSaveNetwork, args=(
-    #         pwins, nwins, draws, self.game, self.args, iter_num,))
-    #     pool.close()
-    #     pool.join()
-
     def learn(self):
         """
         Performs numIters iterations with numEps episodes of self-play in each
@@ -415,10 +429,6 @@ class Coach():
         It then pits the new neural network against the old one and accepts it
         only if it wins >= updateThreshold fraction of games.
         """
-
-        self.nnet1 = nn(self.game, gpu_num=1)
-        self.nnet2 = nn(self.game, gpu_num=2)
-        self.nnet3 = nn(self.game, gpu_num=3)
 
         if self.args.load_model:
             try:
@@ -461,10 +471,6 @@ class Coach():
             #         print(e)
             #         print('train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
             #         print('No checkpoint iter')
-
-            self.nnet1.nnet.load_state_dict(self.nnet.nnet.state_dict())
-            self.nnet2.nnet.load_state_dict(self.nnet.nnet.state_dict())
-            self.nnet3.nnet.load_state_dict(self.nnet.nnet.state_dict())
 
             # print('Check weights')
             # state_dict = self.nnet.nnet.policy.weight.data.cpu().numpy()
@@ -515,12 +521,17 @@ class Coach():
 
             self.trainExamplesHistory.append(iterationTrainExamples)
             self.train_network(i)
+            self.nnet1.nnet.load_state_dict(self.nnet.nnet.state_dict())
+            self.nnet2.nnet.load_state_dict(self.nnet.nnet.state_dict())
+            self.nnet3.nnet.load_state_dict(self.nnet.nnet.state_dict())
+
             self.trainExamplesHistory.clear()
 
             # self.trainExamplesHistory.append(iterationTrainExamples)
             # self.train_network(i)
             # self.trainExamplesHistory.clear()
             # self.parallel_self_test_play(i)
+
     def learn_minimax(self):
 
         for i in range(1, self.args.numIters+1):
@@ -548,4 +559,7 @@ class Coach():
 
             self.trainExamplesHistory.append(iterationTrainExamples)
             self.train_network(i)
+            self.nnet1.nnet.load_state_dict(self.nnet.nnet.state_dict())
+            self.nnet2.nnet.load_state_dict(self.nnet.nnet.state_dict())
+            self.nnet3.nnet.load_state_dict(self.nnet.nnet.state_dict())
             self.trainExamplesHistory.clear()

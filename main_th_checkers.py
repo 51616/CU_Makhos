@@ -17,13 +17,13 @@ args = dotdict({
     'updateThreshold': 0.55,
     'maxlenOfQueue': 200000,
     'numMCTSSims': 100,  # 1600 , 800
-    'arenaCompare': 5,  # 400, 0
+    'arenaCompare': 40,  # 400, 0
     'cpuct': 8,
 
     'multiGPU': True,
     'setGPU': '0',
-    'numSelfPlayPool': 30,
-    'numTestPlayPool': 2,
+    'numSelfPlayPool': 36,
+    'numTestPlayPool': 36,
 
     'checkpoint': '/workspace/CU_Makhos/models_minimax/',
     'load_model': False,
