@@ -545,7 +545,7 @@ class Coach():
 
             iterationTrainExamples = deque([], maxlen=self.args.maxlenOfQueue)
 
-            temp = self.parallel_self_play()
+            temp = self.parallel_minimax_play()
 
             # iterationTrainExamples += temp
             iterationTrainExamples += self.win_games
@@ -562,4 +562,5 @@ class Coach():
             self.nnet1.nnet.load_state_dict(self.nnet.nnet.state_dict())
             self.nnet2.nnet.load_state_dict(self.nnet.nnet.state_dict())
             self.nnet3.nnet.load_state_dict(self.nnet.nnet.state_dict())
+            self.parallel_self_test_play(i)
             self.trainExamplesHistory.clear()
