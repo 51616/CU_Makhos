@@ -112,7 +112,7 @@ if __name__ == "__main__":
     rp = RandomPlayer(g).play
     # gp = GreedyOthelloPlayer(g).play
     # hp = HumanOthelloPlayer(g).play
-    minimax = minimaxAI()
+    minimax = minimaxAI().get_move
     # nnet players
     n1 = NNet(g, gpu_num=0)
     n1.load_checkpoint('/workspace/CU_Makhos/models/',
