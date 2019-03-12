@@ -34,7 +34,7 @@ class MCTS():
         cur_move = self.game.gameState.turn
         cur_stale = self.game.gameState.stale
         for i in range(self.args.numMCTSSims):
-            self.search(boardHistory)
+            self.search(boardHistory, is_search_root=True)
             self.game.gameState.turn = cur_move
             self.game.gameState.stale = cur_stale
 
@@ -53,7 +53,7 @@ class MCTS():
         probs = [x/float(sum(counts)) for x in counts]
         return probs
 
-    def search(self, boardHistory):
+    def search(self, boardHistory, is_search_root=False):
         """
         This function performs one iteration of MCTS. It is recursively called
         till a leaf node is found. The action chosen at each node is one that
@@ -100,9 +100,9 @@ class MCTS():
                 boardHistory, self.game.gameState.turn, self.game.gameState.stale, valids)
             if self.eval:
                 self.Ps[s] = pi
-            else:
+            elif is_search_root:
                 pi += EPS
-                dir_noise = np.random.dirichlet(pi)
+                dir_noise = np.random.dirichlet([1]*32*32)
                 prob = 0.75*pi + 0.25*dir_noise
 
                 self.Ps[s] = [p if p > 1e-8 else 0 for p in prob]
