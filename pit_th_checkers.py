@@ -134,4 +134,4 @@ if __name__ == "__main__":
     # player2 = {'func': minimax, 'name': 'minimax'}
 
     arena = Arena(n1p, n2p, g, display=display)
-    print(arena.playGames(2, verbose=True))
+    print(arena.playGames(20, verbose=True))
