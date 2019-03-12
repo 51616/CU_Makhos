@@ -76,8 +76,8 @@ class minimaxAI:
         for move in possible_moves:
             pi[move_to_index(move)] = 1/len(possible_moves)
 
-        print('Possible moves:', len(possible_moves))
-        print('Pi:', pi)
+        # print('Possible moves:', len(possible_moves))
+        # print('Pi:', pi)
 
         return pi
 
