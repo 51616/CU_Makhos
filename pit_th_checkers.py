@@ -126,7 +126,7 @@ if __name__ == "__main__":
     n2.load_checkpoint('/workspace/CU_Makhos/models/',
                        'train_iter_100.pth.tar')
     args2 = dotdict({'numMCTSSims': 100, 'cpuct': 1.0})
-    mcts2 = MCTS(g, n2, args2)
+    mcts2 = MCTS(g, n1, args2, eval=True)
     def n2p(x): return np.random.choice(
         32*32, p=mcts2.getActionProb(x, temp=0))
 
