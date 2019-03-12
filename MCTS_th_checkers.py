@@ -9,7 +9,7 @@ class MCTS():
     This class handles the MCTS tree.
     """
 
-    def __init__(self, game, nnet, args):
+    def __init__(self, game, nnet, args, eval=False):
         self.game = game
         self.nnet = nnet
         self.args = args
@@ -17,7 +17,7 @@ class MCTS():
         self.Nsa = {}       # stores #times edge s,a was visited
         self.Ns = {}        # stores #times board s was visited
         self.Ps = {}        # stores initial policy (returned by neural net)
-
+        self.eval = eval    # eval mode
         self.Es = {}        # stores game.getGameEnded ended for board s
         self.Vs = {}        # stores game.getValidMoves for board s
 
@@ -98,12 +98,14 @@ class MCTS():
             valids = self.game.getValidMoves(canonicalBoard, 1)
             pi, v = self.nnet.predict(
                 boardHistory, self.game.gameState.turn, self.game.gameState.stale, valids)
+            if self.eval:
+                self.Ps[s] = pi
+            else:
+                pi += EPS
+                dir_noise = np.random.dirichlet(pi)
+                prob = 0.75*pi + 0.25*dir_noise
 
-            pi += EPS
-            dir_noise = np.random.dirichlet(pi)
-            prob = 0.75*pi + 0.25*dir_noise
-
-            self.Ps[s] = [p if p > 1e-8 else 0 for p in prob]
+                self.Ps[s] = [p if p > 1e-8 else 0 for p in prob]
 
             # for p, i in enumerate(self.Ps[s]):
             #     if p < 1e-5:

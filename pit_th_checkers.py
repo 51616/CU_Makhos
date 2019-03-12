@@ -16,18 +16,19 @@ use this script to play any two agents against each other, or play manually with
 any agent.
 """
 
-def Async_Play(game,args,iter_num,bar):
-    bar.suffix = "iter:{i}/{x} | Total: {total:} | ETA: {eta:}".format(i=iter_num+1,x=args.numPlayGames,total=bar.elapsed_td, eta=bar.eta_td)
-    bar.next()
+
+def Async_Play(game, args, iter_num, bar):
+    # bar.suffix = "iter:{i}/{x} | Total: {total:} | ETA: {eta:}".format(i=iter_num+1,x=args.numPlayGames,total=bar.elapsed_td, eta=bar.eta_td)
+    # bar.next()
 
     # set gpu
-    if(args.multiGPU):
-        if(iter_num%2==0):
-            os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-        else:
-            os.environ["CUDA_VISIBLE_DEVICES"] = "1"
-    else:
-        os.environ["CUDA_VISIBLE_DEVICES"] = args.setGPU
+    # if(args.multiGPU):
+    #     if(iter_num%2==0):
+    #         os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+    #     else:
+    #         os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+    # else:
+    #     os.environ["CUDA_VISIBLE_DEVICES"] = args.setGPU
 
     # create NN
     model1 = NNet(game)
@@ -35,12 +36,14 @@ def Async_Play(game,args,iter_num,bar):
 
     # try load weight
     try:
-        model1.load_checkpoint(folder=args.model1Folder, filename=args.model1FileName)
+        model1.load_checkpoint(folder=args.model1Folder,
+                               filename=args.model1FileName)
     except:
         print("load model1 fail")
         pass
     try:
-        model2.load_checkpoint(folder=args.model2Folder, filename=args.model2FileName)
+        model2.load_checkpoint(folder=args.model2Folder,
+                               filename=args.model2FileName)
     except:
         print("load model2 fail")
         pass
@@ -50,30 +53,33 @@ def Async_Play(game,args,iter_num,bar):
     mcts2 = MCTS(game, model2, args)
 
     # each process play 2 games
-    arena = Arena(lambda x: np.argmax(mcts1.getActionProb(x, temp=0)),lambda x: np.argmax(mcts2.getActionProb(x, temp=0)), game)
+    arena = Arena(lambda x: np.argmax(mcts1.getActionProb(x, temp=0)),
+                  lambda x: np.argmax(mcts2.getActionProb(x, temp=0)), game)
     arena.displayBar = False
-    oneWon,twoWon, draws = arena.playGames(2)
-    return oneWon,twoWon, draws
+    oneWon, twoWon, draws = arena.playGames(2)
+    return oneWon, twoWon, draws
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     """
     Before using multiprocessing, please check 2 things before use this script.
     1. The number of PlayPool should not over your CPU's core number.
     2. Make sure all Neural Network which each process created can store in VRAM at same time. Check your NN size before use this.
     """
     args = dotdict({
-    'numMCTSSims': 10,
-    'cpuct': 1,
+        'numMCTSSims': 10,
+        'cpuct': 1,
 
-    'multiGPU': False,  # multiGPU only support 2 GPUs.
-    'setGPU': '0',
-    'numPlayGames': 1,  # total num should x2, because each process play 2 games.
-    'numPlayPool': 1,   # num of processes pool.
+        'multiGPU': False,  # multiGPU only support 2 GPUs.
+        'setGPU': '0',
+        # total num should x2, because each process play 2 games.
+        'numPlayGames': 10,
+        'numPlayPool': 5,   # num of processes pool.
 
-    'model1Folder': './temp/',
-    'model1FileName': 'best.pth.tar',
-    'model2Folder': './temp/',
-    'model2FileName': 'best.pth.tar',
+        'model1Folder': '/workspace/CU_Makhos/models/',
+        'model1FileName': 'best.pth.tar',
+        'model2Folder': '/workspace/CU_Makhos/models/',
+        'model2FileName': 'best.pth.tar',
 
     })
 
@@ -82,7 +88,7 @@ if __name__=="__main__":
         res = []
         result = []
         for i in range(args.numPlayGames):
-            res.append(pool.apply_async(Async_Play,args=(g,args,i,bar)))
+            res.append(pool.apply_async(Async_Play, args=(g, args, i, bar)))
         pool.close()
         pool.join()
 
@@ -95,28 +101,33 @@ if __name__=="__main__":
             oneWon += i[0]
             twoWon += i[1]
             draws += i[2]
-        print("Model 1 Win:",oneWon," Model 2 Win:",twoWon," Draw:",draws)
+        print("Model 1 Win:", oneWon, " Model 2 Win:", twoWon, " Draw:", draws)
 
     g = ThaiCheckersGame()
+    # parallel version
+    # ParallelPlay(g)
 
     # single process version
     # all players
-    # rp = RandomPlayer(g).play
+    rp = RandomPlayer(g).play
     # gp = GreedyOthelloPlayer(g).play
     # hp = HumanOthelloPlayer(g).play
 
     # nnet players
-    n1 = NNet(g)
-    n1.load_checkpoint('temp/','train.pth.tar')
-    args1 = dotdict({'numMCTSSims': 400, 'cpuct':3.0})
-    mcts1 = MCTS(g, n1, args1)
-    n1p = lambda x: np.random.choice(32*32, p=mcts1.getActionProb(x, temp=1))
+    n1 = NNet(g, gpu_num=0)
+    n1.load_checkpoint('/workspace/CU_Makhos/models/',
+                       'train_iter_190.pth.tar')
+    args1 = dotdict({'numMCTSSims': 200, 'cpuct': 1.0})
+    mcts1 = MCTS(g, n1, args1, eval=True)
+    def n1p(x): return np.random.choice(
+        32*32, p=mcts1.getActionProb(x, temp=1))
 
-    n2 = NNet(g)
-    n2.load_checkpoint('temp/','train.pth.tar')
-    args2 = dotdict({'numMCTSSims': 400, 'cpuct':3.0})
-    mcts2 = MCTS(g, n2, args2)
-    n2p = lambda x: np.random.choice(32*32, p=mcts2.getActionProb(x, temp=1))
+    # n2 = NNet(g)
+    # n2.load_checkpoint('temp/', 'train.pth.tar')
+    # args2 = dotdict({'numMCTSSims': 400, 'cpuct': 3.0})
+    # mcts2 = MCTS(g, n2, args2)
+    # def n2p(x): return np.random.choice(
+    #     32*32, p=mcts2.getActionProb(x, temp=1))
 
-    arena = Arena(n1p, n2p, g, display=display)
+    arena = Arena(n1p, rp, g, display=display)
     print(arena.playGames(2, verbose=True))
