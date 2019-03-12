@@ -26,7 +26,7 @@ args = dotdict({
     'numTestPlayPool': 36,
 
     'checkpoint': '/workspace/CU_Makhos/models_minimax/',
-    'load_model': False,
+    'load_model': True,
     'load_iter': 3,  # 160
     'load_folder_file': '/workspace/CU_Makhos/models_minimax/',
     'numItersForTrainExamplesHistory': 50  # 4
