@@ -112,7 +112,7 @@ if __name__ == "__main__":
     rp = RandomPlayer(g).play
     # gp = GreedyOthelloPlayer(g).play
     # hp = HumanOthelloPlayer(g).play
-    minimax = minimaxAI(game=g, depth=5).get_move
+    minimax = minimaxAI(game=g, depth=7).get_move
     # nnet players
     n1 = NNet(g, gpu_num=0)
     n1.load_checkpoint('/workspace/CU_Makhos/models/',
@@ -134,4 +134,4 @@ if __name__ == "__main__":
     # player2 = {'func': minimax, 'name': 'minimax'}
 
     arena = Arena(minimax, minimax, g, display=display)
-    print(arena.playGames(20, verbose=True))
+    print(arena.playGames(10, verbose=True))
