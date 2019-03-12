@@ -78,7 +78,7 @@ def AsyncSelfPlay(nnet, game, args, iter_num):  # , bar
         # if histIdx<7:
         #     histIdx+=1
 
-        trainExamples.append([boardHistory, curPlayer, pi,
+        trainExamples.append([canonicalBoard, curPlayer, pi,
                               game.gameState.turn, game.gameState.stale, valids])
 
         action = np.random.choice(len(pi), p=pi)
@@ -111,7 +111,7 @@ def AsyncMinimaxPlay(game, args):
 
     minimax = minimaxAI(game)
 
-    boardHistory = deque(np.zeros((8, 8, 8), dtype='int'), maxlen=8)
+    #boardHistory = deque(np.zeros((8, 8, 8), dtype='int'), maxlen=8)
     trainExamples = []
     board = game.getInitBoard()
     curPlayer = 1
@@ -120,12 +120,12 @@ def AsyncMinimaxPlay(game, args):
     while True:
         episodeStep += 1
         canonicalBoard = game.getCanonicalForm(board, curPlayer)
-        boardHistory.append(canonicalBoard)
+        # boardHistory.append(canonicalBoard)
 
-        pi = minimax.get_pi(boardHistory)
+        pi = minimax.get_pi(canonicalBoard)
         valids = game.getValidMoves(canonicalBoard, 1)
 
-        trainExamples.append([boardHistory, curPlayer, pi,
+        trainExamples.append([canonicalBoard, curPlayer, pi,
                               game.gameState.turn, game.gameState.stale, valids])
 
         action = np.random.choice(len(pi), p=pi)

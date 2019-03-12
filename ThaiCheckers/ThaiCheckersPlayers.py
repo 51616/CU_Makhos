@@ -58,7 +58,7 @@ class minimaxAI:
 
     def get_move(self, checkers):
         board = Board(
-            checkers[-1], 1, self.game.gameState.turn, self.game.gameState.stale)
+            checkers, 1, self.game.gameState.turn, self.game.gameState.stale)
         #self.num_move_called += 1
         #start_time = time.time()
         possible_moves = self.minimax_start(board, self.depth, True)
@@ -67,7 +67,7 @@ class minimaxAI:
 
     def get_pi(self, checkers):
         board = Board(
-            checkers[-1], 1, self.game.gameState.turn, self.game.gameState.stale)
+            checkers, 1, self.game.gameState.turn, self.game.gameState.stale)
 
         possible_moves = self.minimax_start(board, self.depth, True)
 
@@ -75,7 +75,8 @@ class minimaxAI:
         pi = np.zeros((32*32))
         for move in possible_moves:
             pi[move_to_index(move)] = 1/len(possible_moves)
-        print('Possible moves:,'len(possible_moves))
+
+        print('Possible moves:', len(possible_moves))
         print('Pi:', pi)
 
         return pi

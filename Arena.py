@@ -37,8 +37,7 @@ class Arena():
             or
                 draw result returned from the game that is neither 1, -1, nor 0.
         """
-        boardHistory = deque(np.zeros((8, 8, 8), dtype='int'),
-                             maxlen=8)  # history for NN
+        # boardHistory = deque(np.zeros((8, 8, 8), dtype='int'),maxlen=8)  # history for NN
 
         players = [self.player2, None, self.player1]
         curPlayer = 1
@@ -51,9 +50,9 @@ class Arena():
                 print("Turn ", str(it), "Player ", str(curPlayer))
                 self.display(board)
 
-            boardHistory.append(self.game.getCanonicalForm(board, curPlayer))
             # try:
-            action = players[curPlayer+1](boardHistory)
+            action = players[curPlayer +
+                             1](self.game.getCanonicalForm(board, curPlayer))
             # except:
             #     action = players[curPlayer+1](boardHistory[-1])
 
