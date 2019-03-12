@@ -4,6 +4,7 @@ import copy
 from .preprocessing import move_to_index, index_to_move
 from .ThaiCheckersLogic import Board
 from random import randint
+from random import choice
 
 
 class RandomPlayer():
@@ -60,9 +61,24 @@ class minimaxAI:
             checkers[-1], 1, self.game.gameState.turn, self.game.gameState.stale)
         #self.num_move_called += 1
         #start_time = time.time()
-        (start_point, end_point) = self.minimax_start(board, self.depth, True)
+        possible_moves = self.minimax_start(board, self.depth, True)
         #self.total_time_elapsed += time.time() - start_time
-        return move_to_index((start_point, end_point))
+        return move_to_index(choice(possible_moves))
+
+    def get_pi(self, checkers):
+        board = Board(
+            checkers[-1], 1, self.game.gameState.turn, self.game.gameState.stale)
+
+        possible_moves = self.minimax_start(board, self.depth, True)
+
+        # return move_to_index(choice(start_point, end_point))
+        pi = np.zeros((32*32))
+        for move in possible_moves:
+            pi[move_to_index(move)] = 1/len(possible_moves)
+        print('Possible moves:,'len(possible_moves))
+        print('Pi:', pi)
+
+        return pi
 
     def minimax_start(self, checkers, depth, maximizing_player):
         alpha = float('-inf')
@@ -81,11 +97,11 @@ class minimaxAI:
             heuristics.append(self.minimax(
                 temp_checkers, depth-1, not maximizing_player, alpha, beta))
 
-        max_heuristics = float('-inf')
+        max_heuristics = np.max(np.array(heuristics))
 
-        for heu in heuristics:
-            if heu > max_heuristics:
-                max_heuristics = heu
+        # for heu in heuristics:
+        #     if heu > max_heuristics:
+        #         max_heuristics = heu
         i = 0
         while i < len(heuristics):
             heu = heuristics[i]
@@ -95,7 +111,7 @@ class minimaxAI:
                 i -= 1
             i += 1
 
-        return possible_moves[randint(0, len(possible_moves) - 1)]
+        return possible_moves  # [randint(0, len(possible_moves) - 1)]
 
     def minimax(self, checkers, depth, maximizing_player, alpha, beta):
         if depth == 0:

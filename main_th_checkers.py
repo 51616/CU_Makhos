@@ -16,7 +16,7 @@ args = dotdict({
     'tempThreshold': 15,
     'updateThreshold': 0.55,
     'maxlenOfQueue': 200000,
-    'numMCTSSims': 100 + 160,  # 1600 , 800
+    'numMCTSSims': 100,  # 1600 , 800
     'arenaCompare': 5,  # 400, 0
     'cpuct': 3,
 
@@ -25,12 +25,11 @@ args = dotdict({
     'numSelfPlayPool': 30,
     'numTestPlayPool': 2,
 
-    'checkpoint': '/workspace/CU_Makhos/models/',
-    'load_model': True,
+    'checkpoint': '/workspace/CU_Makhos/models_minimax/',
+    'load_model': False,
     'load_iter': 160,
-    'start_iter': 161,
-    'load_folder_file': '/workspace/CU_Makhos/models/',
-    'numItersForTrainExamplesHistory': 4 + 16
+    'load_folder_file': '/workspace/CU_Makhos/models_minimax/',
+    'numItersForTrainExamplesHistory': 4
 
 })
 
@@ -43,4 +42,4 @@ if __name__ == "__main__":
     # if args.load_model:
     #print("Load trainExamples from file")
     # c.loadTrainExamples()
-    c.learn()
+    c.learn_minimax()

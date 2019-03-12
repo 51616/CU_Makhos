@@ -5,6 +5,7 @@ import numpy as np
 from pytorch_classification.utils import Bar, AverageMeter
 from ThaiCheckers.ThaiCheckersGame import ThaiCheckersGame as Game
 from ThaiCheckers.pytorch.NNet import NNetWrapper as nn
+from ThaiCheckers.ThaiCheckersPlayers import minimaxAI
 import time
 import os
 import sys
@@ -20,7 +21,7 @@ import copy
 mp = multiprocessing.get_context('spawn')
 
 
-def AsyncSelfPlay(nnet, game, args, iter_num, iterr):  # , bar
+def AsyncSelfPlay(nnet, game, args, iter_num):  # , bar
 
     # bar.suffix = "iter:{i}/{x} | Total: {total:} | ETA: {eta:}".format(
     #     i=iter_num+1, x=iterr, total=bar.elapsed_td, eta=bar.eta_td)
@@ -102,6 +103,38 @@ def AsyncSelfPlay(nnet, game, args, iter_num, iterr):  # , bar
             #     draw_count += 1
             # else:
             #     win_loss_count += 1
+
+            return [(x[0], x[2], r*x[1], x[3], x[4], x[5]) for x in trainExamples], r
+
+
+def AsyncMinimaxPlay(game, args):
+
+    minimax = minimaxAI(game)
+
+    boardHistory = deque(np.zeros((8, 8, 8), dtype='int'), maxlen=8)
+    trainExamples = []
+    board = game.getInitBoard()
+    curPlayer = 1
+    episodeStep = 0
+
+    while True:
+        episodeStep += 1
+        canonicalBoard = game.getCanonicalForm(board, curPlayer)
+        boardHistory.append(canonicalBoard)
+
+        pi = minimax.get_pi(boardHistory)
+        valids = game.getValidMoves(canonicalBoard, 1)
+
+        trainExamples.append([boardHistory, curPlayer, pi,
+                              game.gameState.turn, game.gameState.stale, valids])
+
+        action = np.random.choice(len(pi), p=pi)
+        board, curPlayer = game.getNextState(
+            board, curPlayer, action)
+
+        r = game.getGameEnded(board, curPlayer)  # winner
+
+        if r != 0:
 
             return [(x[0], x[2], r*x[1], x[3], x[4], x[5]) for x in trainExamples], r
 
@@ -219,14 +252,11 @@ class Coach():
         self.game = game
         self.args = args
         self.nnet = nn(game, gpu_num=0)
-        self.nnet1 = nn(game, gpu_num=1)
-        self.nnet2 = nn(game, gpu_num=2)
-        self.nnet3 = nn(game, gpu_num=3)
 
-        state_dict = self.nnet.nnet.state_dict()
-        self.nnet1.nnet.load_state_dict(state_dict)
-        self.nnet2.nnet.load_state_dict(state_dict)
-        self.nnet3.nnet.load_state_dict(state_dict)
+        # state_dict = self.nnet.nnet.state_dict()
+        # self.nnet1.nnet.load_state_dict(state_dict)
+        # self.nnet2.nnet.load_state_dict(state_dict)
+        # self.nnet3.nnet.load_state_dict(state_dict)
 
         self.trainExamplesHistory = []
         self.checkpoint_iter = 0
@@ -238,34 +268,6 @@ class Coach():
         self.win_games = []
         self.loss_games = []
         self.draw_games = []
-
-    # def parallel_self_play_process(self):
-    #     processes = []
-    #     temp = []
-    #     result = []
-
-    #     for i in range(self.args.numSelfPlayPool):
-    #         p = mp.Process(target=AsyncSelfPlay, args=(
-    #             self.nnet, self.game, self.args, i, self.args.numEps))
-    #         p.start()
-    #         processes.append(p)
-
-    #     for p in processes:
-    #         p.join()
-
-    #     for i in processes:
-    #         gameplay, r = i.get()
-    #         result.append(gameplay)
-    #         if (r == 1e-4):
-    #             self.draw_count += 1
-    #         elif r == 1:
-    #             self.win_count += 1
-    #         else:
-    #             self.loss_count += 1
-
-    #     for i in result:
-    #         temp += i
-    #     return temp
 
     def parallel_self_play(self):
         pool = mp.Pool(processes=self.args.numSelfPlayPool)
@@ -287,7 +289,52 @@ class Coach():
                 net = self.nnet3
 
             res.append(pool.apply_async(AsyncSelfPlay, args=(
-                net, self.game, self.args, i, self.args.numEps)))  # , bar
+                net, self.game, self.args, i)))
+
+        pool.close()
+        pool.join()
+        # print("Done self-play")
+
+        for i in res:
+            gameplay, r = i.get()
+            result.append(gameplay)
+            if (r == 1e-4):
+                self.draw_count += 1
+                temp_draw_games.append(gameplay)
+            elif r == 1:
+                self.win_count += 1
+                temp_win_games.append(gameplay)
+            else:
+                self.loss_count += 1
+                temp_loss_games.append(gameplay)
+
+        for i in result:
+            temp += i
+        for i in temp_draw_games:
+            self.draw_games += i
+
+        for i in temp_win_games:
+            self.win_games += i
+
+        for i in temp_loss_games:
+            self.loss_games += i
+        return temp
+
+    def parallel_minimax_play(self):
+        pool = mp.Pool(processes=self.args.numSelfPlayPool)
+        temp = []
+        res = []
+        result = []
+
+        temp_draw_games = []
+        temp_win_games = []
+        temp_loss_games = []
+        # bar = Bar('Self Play', max=self.args.numEps)
+        # bar = tqdm(total=self.args.numEps)
+        for i in range(self.args.numEps):
+
+            res.append(pool.apply_async(AsyncMinimaxPlay, args=(
+                self.game, self.args)))
 
         pool.close()
         pool.join()
@@ -367,6 +414,11 @@ class Coach():
         It then pits the new neural network against the old one and accepts it
         only if it wins >= updateThreshold fraction of games.
         """
+
+        self.nnet1 = nn(self.game, gpu_num=1)
+        self.nnet2 = nn(self.game, gpu_num=2)
+        self.nnet3 = nn(self.game, gpu_num=3)
+
         if self.args.load_model:
             try:
                 self.nnet.load_checkpoint(
@@ -377,12 +429,20 @@ class Coach():
             except Exception as e:
                 print(e)
                 print("Create a new model")
+
         pytorch_total_params = sum(p.numel()
                                    for p in self.nnet.nnet.parameters() if p.requires_grad)
 
         print('Num trainable params:', pytorch_total_params)
 
-        for i in range(self.args.start_iter, self.args.numIters+1):
+        start_iter = 1
+        if self.args.loadmodel:
+            start_iter += self.args.load_iter
+            self.args.numMCTSSims += self.args.load_iter
+            self.args.numItersForTrainExamplesHistory = min(
+                20, 4 + (self.args.load_iter-4)//2)
+
+        for i in range(start_iter, self.args.numIters+1):
             if (self.args.numMCTSSims < 400):
                 self.args.numMCTSSims += 1
             if ((i > 5) and (i % 2 == 0) and (self.args.numItersForTrainExamplesHistory < 20)):
@@ -460,3 +520,31 @@ class Coach():
             # self.train_network(i)
             # self.trainExamplesHistory.clear()
             # self.parallel_self_test_play(i)
+    def learn_minimax(self):
+
+        for i in range(1, self.args.numIters+1):
+            self.win_count = 0
+            self.loss_count = 0
+            self.draw_count = 0
+
+            self.win_games = []
+            self.loss_games = []
+            self.draw_games = []
+
+            iterationTrainExamples = deque([], maxlen=self.args.maxlenOfQueue)
+
+            temp = self.parallel_self_play()
+
+            # iterationTrainExamples += temp
+            iterationTrainExamples += self.win_games
+            iterationTrainExamples += self.loss_games
+            iterationTrainExamples += self.draw_games
+
+            print('Win count:', self.win_count, 'Loss count:',
+                  self.loss_count, 'Draw count:', self.draw_count)
+
+            self.checkpoint_iter = i
+
+            self.trainExamplesHistory.append(iterationTrainExamples)
+            self.train_network(i)
+            self.trainExamplesHistory.clear()
