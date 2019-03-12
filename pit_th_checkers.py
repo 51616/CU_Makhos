@@ -122,15 +122,16 @@ if __name__ == "__main__":
     def n1p(x): return np.random.choice(
         32*32, p=mcts1.getActionProb(x, temp=0))
 
-    # n2 = NNet(g)
-    # n2.load_checkpoint('temp/', 'train.pth.tar')
-    # args2 = dotdict({'numMCTSSims': 400, 'cpuct': 3.0})
-    # mcts2 = MCTS(g, n2, args2)
-    # def n2p(x): return np.random.choice(
-    #     32*32, p=mcts2.getActionProb(x, temp=1))
+    n2 = NNet(g, gpu_num=0)
+    n2.load_checkpoint('/workspace/CU_Makhos/models/',
+                       'train_iter_100.pth.tar')
+    args2 = dotdict({'numMCTSSims': 100, 'cpuct': 1.0})
+    mcts2 = MCTS(g, n2, args2)
+    def n2p(x): return np.random.choice(
+        32*32, p=mcts2.getActionProb(x, temp=0))
 
     # player1 = {'func': n1p, 'name': 'NNet'}
     # player2 = {'func': minimax, 'name': 'minimax'}
 
-    arena = Arena(n1p, minimax, g, display=display)
+    arena = Arena(n1p, n2p, g, display=display)
     print(arena.playGames(2, verbose=True))
