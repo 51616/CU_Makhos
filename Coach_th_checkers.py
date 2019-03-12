@@ -50,7 +50,7 @@ def AsyncSelfPlay(nnet, game, args, iter_num):  # , bar
     #     net.load_checkpoint(folder=args.checkpoint, filename='best.pth.tar')
     # except:
     #     pass
-    boardHistory = deque(np.zeros((8, 8, 8), dtype='int'), maxlen=8)
+    # boardHistory = deque(np.zeros((8, 8, 8), dtype='int'), maxlen=8)
     # histIdx = 0
     trainExamples = []
     board = game.getInitBoard()
@@ -60,11 +60,11 @@ def AsyncSelfPlay(nnet, game, args, iter_num):  # , bar
     while True:
         episodeStep += 1
         canonicalBoard = game.getCanonicalForm(board, curPlayer)
-        boardHistory.append(canonicalBoard)
+        # boardHistory.append(canonicalBoard)
         # temp = int(episodeStep < args.tempThreshold)
         # print('canonical Board')
         # print(canonicalBoard)
-        pi = mcts.getActionProb(boardHistory, temp=1)
+        pi = mcts.getActionProb(canonicalBoard, temp=1)
         valids = game.getValidMoves(canonicalBoard, 1)
         # bs, ps = zip(*game.getSymmetries(canonicalBoard, pi))
         # _, valids_sym = zip(
@@ -186,6 +186,7 @@ def TrainNetwork(nnet, game, args, iter_num, trainhistory):
     #     # f.closed
     # ------------------
     nnet.train(trainExamples)
+
     nnet.save_checkpoint(folder=args.checkpoint,
                          filename='train_iter_' + str(iter_num) + '.pth.tar')
 

@@ -31,7 +31,7 @@ class MCTS():
             probs: a policy vector where the probability of the ith action is
                    proportional to Nsa[(s,a)]**(1./temp)
         """
-        #print('len getprob:', len(boardHistory))
+        # print('len getprob:', len(boardHistory))
         cur_move = self.game.gameState.turn
         cur_stale = self.game.gameState.stale
         for i in range(self.args.numMCTSSims):
@@ -40,7 +40,7 @@ class MCTS():
             self.game.gameState.stale = cur_stale
 
         s = self.game.stringRepresentation(boardHistory)
-        #print('string rep:',s)
+        # print('string rep:',s)
         counts = [self.Nsa[(s, a)] if (
             s, a) in self.Nsa else 0 for a in range(self.game.getActionSize())]
 
@@ -77,7 +77,7 @@ class MCTS():
         # print(canonicalBoard)
         # print()
         s = self.game.stringRepresentation(boardHistory)
-        canonicalBoard = boardHistory[-1]
+        canonicalBoard = boardHistory
         if s not in self.Es:
             self.Es[s] = self.game.getGameEnded(canonicalBoard, 1)
 
@@ -97,22 +97,9 @@ class MCTS():
         if s not in self.Ps:
             # leaf node
             valids = self.game.getValidMoves(canonicalBoard, 1)
-            pi, v = self.nnet.predict(
+            self.Ps[s], v = self.nnet.predict(
                 boardHistory, self.game.gameState.turn, self.game.gameState.stale, valids)
 
-            if is_search_root and not self.eval:
-                dir_noise = np.random.dirichlet([1]*32*32)
-                self.Ps[s] = 0.75*pi + 0.25*dir_noise
-                # #pi += EPS
-                # dir_noise = np.random.dirichlet([1]*32*32)
-                # self.Ps[s] = 0.75*pi + 0.25*dir_noise
-                # #self.Ps[s] = [p if p > 1e-8 else 0 for p in prob]
-            else:
-                self.Ps[s] = pi
-
-            # for p, i in enumerate(self.Ps[s]):
-            #     if p < 1e-5:
-            #         self.Ps[s][i] = 0
             # valids = self.game.getValidMoves(canonicalBoard, 1)
             # self.Ps[s] = self.Ps[s]*valids      # masking invalid moves
             sum_Ps_s = np.sum(self.Ps[s])
@@ -133,6 +120,10 @@ class MCTS():
             self.Ns[s] = 0
             # print('return not in ps')
             return -v
+
+        if is_search_root and not self.eval:
+            dir_noise = np.random.dirichlet([1]*32*32)
+            self.Ps[s] = 0.75*self.Ps[s] + 0.25*dir_noise
 
         valids = self.Vs[s]
         cur_best = -float('inf')
@@ -156,17 +147,17 @@ class MCTS():
 
         a = random.choice(best_act)
 
-        #a = best_act
+        # a = best_act
         next_s, next_player = self.game.getNextState(canonicalBoard, 1, a)
         # print()
         # print('sim board')
         # print(next_s)
         # print()
         next_s = self.game.getCanonicalForm(next_s, next_player)
-        newHistory = boardHistory.copy()
-        newHistory.append(next_s)
+        # newHistory = boardHistory.copy()
+        # newHistory.append(next_s)
 
-        v = self.search(newHistory)
+        v = self.search(next_s)
 
         if (s, a) in self.Qsa:
             self.Qsa[(s, a)] = (self.Nsa[(s, a)] *

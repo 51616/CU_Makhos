@@ -29,7 +29,7 @@ args = dotdict({
     'batch_size': 256,  # 4096
     'cuda': torch.cuda.is_available(),
     'num_channels': 128,  # 256
-    'num_blocks': 20
+    'num_blocks': 10
 })
 
 #torch.backends.cudnn.benchmark = True
@@ -66,10 +66,10 @@ class NNetWrapper(NeuralNet):
         """
 
         self.scheduler.step()
-        # self.nnet.train()
+        self.nnet.train()
         for epoch in range(args.epochs):
             # random.sample(past_examples, len(past_examples)//8)
-            examples = past_examples
+            examples = past_examples[:int(len(past_examples)*0.9)]
             print('EPOCH ::: ' + str(epoch+1))
 
             # data_time = AverageMeter()
@@ -165,9 +165,9 @@ class NNetWrapper(NeuralNet):
         val_pi_loss = 0
         val_v_loss = 0
 
-        # self.nnet.eval()
+        self.nnet.eval()
 
-        val_examples = random.sample(past_examples, len(past_examples)//2)
+        val_examples = past_examples[int(len(past_examples)*0.9):]
 
         batch_idx = 0
         number_of_batches = int(
@@ -283,19 +283,19 @@ class NNetWrapper(NeuralNet):
 
         out = []
 
-        for i in range(len(board)):
-            currentplayer_pieces = np.zeros((8, 8))
-            currentplayer_kings = np.zeros((8, 8))
-            other_pieces = np.zeros((8, 8))
-            other_kings = np.zeros((8, 8))
-            currentplayer_pieces[board[i] == 1] = 1
-            currentplayer_kings[board[i] == 3] = 1
-            other_pieces[board[i] == -1] = 1
-            other_kings[board[i] == -3] = 1
-            out.append(currentplayer_pieces)
-            out.append(currentplayer_kings)
-            out.append(other_pieces)
-            out.append(other_kings)
+        # for i in range(len(board)):
+        currentplayer_pieces = np.zeros((8, 8))
+        currentplayer_kings = np.zeros((8, 8))
+        other_pieces = np.zeros((8, 8))
+        other_kings = np.zeros((8, 8))
+        currentplayer_pieces[board == 1] = 1
+        currentplayer_kings[board == 3] = 1
+        other_pieces[board == -1] = 1
+        other_kings[board == -3] = 1
+        out.append(currentplayer_pieces)
+        out.append(currentplayer_kings)
+        out.append(other_pieces)
+        out.append(other_kings)
 
         turn_plane = np.zeros((8, 8))
         stale_plane = np.zeros((8, 8))

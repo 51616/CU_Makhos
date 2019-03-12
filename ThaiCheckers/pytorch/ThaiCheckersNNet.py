@@ -19,7 +19,7 @@ class ThaiCheckersNNet(nn.Module):
         # game params
         self.board_x, self.board_y = game.getBoardSize()
         self.action_size = game.getActionSize()
-        self.input_channels = 34
+        self.input_channels = 6
         self.args = args
 
         super(ThaiCheckersNNet, self).__init__()
@@ -122,7 +122,7 @@ class ResNet(nn.Module):
         super(ResNet, self).__init__()
         self.board_x, self.board_y = game.getBoardSize()
         self.action_size = game.getActionSize()
-        self.input_channels = 34
+        self.input_channels = 6
         # self.args = args
         self.board_size = [self.input_channels, self.board_x, self.board_y]
 
