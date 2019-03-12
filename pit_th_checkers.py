@@ -129,5 +129,5 @@ if __name__ == "__main__":
     # def n2p(x): return np.random.choice(
     #     32*32, p=mcts2.getActionProb(x, temp=1))
 
-    arena = Arena(rp, rp, g, display=display)
+    arena = Arena(n1p, rp, g, display=display)
     print(arena.playGames(2, verbose=True))

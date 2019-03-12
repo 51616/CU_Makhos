@@ -1,6 +1,7 @@
 import numpy as np
 from pytorch_classification.utils import Bar, AverageMeter
 import time
+from collections import deque
 
 
 class Arena():
@@ -36,6 +37,9 @@ class Arena():
             or
                 draw result returned from the game that is neither 1, -1, nor 0.
         """
+        boardHistory = deque(np.zeros((8, 8, 8), dtype='int'),
+                             maxlen=8)  # history for NN
+
         players = [self.player2, None, self.player1]
         curPlayer = 1
         board = self.game.getInitBoard()
@@ -46,8 +50,12 @@ class Arena():
                 assert(self.display)
                 print("Turn ", str(it), "Player ", str(curPlayer))
                 self.display(board)
-            action = players[curPlayer +
-                             1](self.game.getCanonicalForm(board, curPlayer))
+
+            boardHistory.append(self.game.getCanonicalForm(board, curPlayer))
+            try:
+                action = players[curPlayer+1](boardHistory)
+            except:
+                action = players[curPlayer+1](boardHistory[-1])
 
             valids = self.game.getValidMoves(
                 self.game.getCanonicalForm(board, curPlayer), 1)
@@ -97,8 +105,8 @@ class Arena():
             eps_time.update(time.time() - end)
             end = time.time()
             if(self.displaybar):
-                bar.suffix  = '({eps}/{maxeps}) Eps Time: {et:.3f}s | Total: {total:} | ETA: {eta:}'.format(eps=eps+1, maxeps=maxeps, et=eps_time.avg,
-                                                                                                        total=bar.elapsed_td, eta=bar.eta_td)
+                bar.suffix = '({eps}/{maxeps}) Eps Time: {et:.3f}s | Total: {total:} | ETA: {eta:}'.format(eps=eps+1, maxeps=maxeps, et=eps_time.avg,
+                                                                                                           total=bar.elapsed_td, eta=bar.eta_td)
                 bar.next()
 
         self.player1, self.player2 = self.player2, self.player1
@@ -116,8 +124,8 @@ class Arena():
             eps_time.update(time.time() - end)
             end = time.time()
             if(self.displaybar):
-                bar.suffix  = '({eps}/{maxeps}) Eps Time: {et:.3f}s | Total: {total:} | ETA: {eta:}'.format(eps=eps+1, maxeps=maxeps, et=eps_time.avg,
-                                                                                                        total=bar.elapsed_td, eta=bar.eta_td)
+                bar.suffix = '({eps}/{maxeps}) Eps Time: {et:.3f}s | Total: {total:} | ETA: {eta:}'.format(eps=eps+1, maxeps=maxeps, et=eps_time.avg,
+                                                                                                           total=bar.elapsed_td, eta=bar.eta_td)
                 bar.next()
 
         bar.finish()
