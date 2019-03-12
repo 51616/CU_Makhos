@@ -12,7 +12,7 @@ Before using multiprocessing, please check 2 things before use this script.
 
 args = dotdict({
     'numIters': 50,
-    'numEps': 1000,  # 25000
+    'numEps': 500,  # 25000
     'tempThreshold': 15,
     'updateThreshold': 0.55,
     'maxlenOfQueue': 200000,
