@@ -56,7 +56,8 @@ class minimaxAI:
         self.side = side
 
     def get_move(self, checkers):
-        board = Board(checkers[-1], 1, self.game.turn, self.game.stale)
+        board = Board(
+            checkers[-1], 1, self.game.gameState.turn, self.game.gameState.stale)
         #self.num_move_called += 1
         #start_time = time.time()
         (start_point, end_point) = self.minimax_start(board, self.depth, True)
