@@ -170,11 +170,11 @@ def TrainNetwork(nnet, game, args, iter_num, trainhistory):
         print('Length after remove:', len(trainhistory))
     # -------------------
     # ---extend history---
-    unique_train_history = build_unique_examples(trainhistory)
+    trainExamples = build_unique_examples(trainhistory)
 
-    trainExamples = []
-    for e in unique_train_history:
-        trainExamples.extend(e)
+    # trainExamples = []
+    # for e in unique_train_history:
+    #     trainExamples.extend(e)
     shuffle(trainExamples)
     print('Total train samples (moves):', len(trainExamples))
     # ---save history---

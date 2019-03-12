@@ -44,7 +44,7 @@ def build_unique_examples(examplesHistory):
 
     print("stateMap.size:", len(stateMap))
 
-    newExamples = deque()
+    newExamples = []
 
     for s in stateMap.keys():
 
