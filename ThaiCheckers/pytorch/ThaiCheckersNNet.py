@@ -98,13 +98,17 @@ class ResBlock(nn.Module):
 
     def forward(self, x):
         inp = x
-        x = self.conv1(x)
+
         x = self.bn1(x)
         x = F.relu(x)
-        x = self.conv2(x)
+        x = self.conv1(x)
+
         x = self.bn2(x)
-        x = x + inp
         x = F.relu(x)
+        x = self.conv2(x)
+
+        x = x + inp
+
         return x
 
 
