@@ -1,7 +1,7 @@
 import numpy as np
 import time
 import copy
-
+from .preprocessing import move_to_index, index_to_move
 from random import randint
 
 
@@ -42,26 +42,24 @@ class HumanThaiCheckersPlayer():
 
 class minimaxAI:
 
-    def __init__(self, side=-1, depth=5):
-        self.total_time_elapsed = 0
-        self.skipping_point = None
-        self.pruned = 0
-        self.num_move_called = 0
+    def __init__(self, side=1, depth=5):
+        #self.total_time_elapsed = 0
+        #self.skipping_point = None
+        #self.pruned = 0
+        #self.num_move_called = 0
         self.side = side
         self.depth = depth
 
-    def set_side(self, side=-1):
+    def set_side(self, side=1):
         self.side = side
 
     def get_move(self, checkers):
-        self.num_move_called += 1
-        start_time = time.time()
-        (start_point, end_point) = self.minimax_start(checkers, self.depth, True)
-        self.total_time_elapsed += time.time() - start_time
-        return (start_point, end_point)
-
-    def get_average_time_per_move(self):
-        return self.total_time_elapsed / self.num_move_called * (10 ** -6)
+        board = checkers[-1].gameState
+        #self.num_move_called += 1
+        #start_time = time.time()
+        (start_point, end_point) = self.minimax_start(board, self.depth, True)
+        #self.total_time_elapsed += time.time() - start_time
+        return move_to_index((start_point, end_point))
 
     def minimax_start(self, checkers, depth, maximizing_player):
         alpha = float('-inf')
