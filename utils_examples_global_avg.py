@@ -12,7 +12,7 @@ from utils import *
 def build_unique_examples(examplesHistory):
     """ Make examples unique by averaging policy_vector (pi) and value (v) for the same positions """
 
-    print("build_unique_examples() history.length=", len(examplesHistory))
+    #print("build_unique_examples() history.length=", len(examplesHistory))
     start = time.time()
 
     stateMap = {}
@@ -24,7 +24,7 @@ def build_unique_examples(examplesHistory):
     for examples in examplesHistory:
         step += 1
         initialCount += len(examples)
-        print("step:", step, ", examples.length:", len(examples))
+        #print("step:", step, ", examples.length:", len(examples))
 
         # validate_random_sample(examples)
 
@@ -42,7 +42,7 @@ def build_unique_examples(examplesHistory):
                 stateMap[s] = deque()
             stateMap[s].append(move)
 
-    print("stateMap.size:", len(stateMap))
+    #print("stateMap.size:", len(stateMap))
 
     newExamples = []
 
@@ -79,6 +79,6 @@ def build_unique_examples(examplesHistory):
     print("total number of examples changed from",
           initialCount, "to", len(newExamples))
     full_time = time.time()-start
-    print("time:", full_time, "s")
+    #print("time:", full_time, "s")
 
     return newExamples

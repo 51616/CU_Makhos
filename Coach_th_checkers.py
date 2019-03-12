@@ -533,13 +533,28 @@ class Coach():
             # self.parallel_self_test_play(i)
 
     def learn_minimax(self):
-        
+
+        if self.args.load_model:
+            try:
+                self.nnet.load_checkpoint(
+                    folder=self.args.checkpoint, filename='train_iter_'+str(self.args.load_iter)+'.pth.tar', load_optimizer=False)
+                # self.nnet1.load_state_dict(self.nnet.state_dict())
+                # self.nnet2.load_state_dict(self.nnet.state_dict())
+
+            except Exception as e:
+                print(e)
+                print("Create a new model")
+
         pytorch_total_params = sum(p.numel()
                                    for p in self.nnet.nnet.parameters() if p.requires_grad)
 
         print('Num trainable params:', pytorch_total_params)
 
-        for i in range(1, self.args.numIters+1):
+        start_iter = 1
+        if self.args.loadmodel:
+            start_iter += self.args.load_iter
+
+        for i in range(start_iter, self.args.numIters+1):
             print('------ITER ' + str(i) + '------')
             self.win_count = 0
             self.loss_count = 0

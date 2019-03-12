@@ -254,7 +254,7 @@ class NNetWrapper(NeuralNet):
             'scheduler': self.scheduler.state_dict()
         }, filepath)
 
-    def load_checkpoint(self, folder='checkpoint', filename='checkpoint.pth.tar'):
+    def load_checkpoint(self, folder='checkpoint', filename='checkpoint.pth.tar', load_optimizer=True):
         filepath = os.path.join(folder, filename)
         if not os.path.exists(filepath):
             print("No model in path {}".format(filepath))
@@ -271,11 +271,11 @@ class NNetWrapper(NeuralNet):
         #     self.nnet.parameters(), lr=args.lr, weight_decay=0.0001)
         # self.scheduler = torch.optim.lr_scheduler.MultiStepLR(
         #     self.optimizer, milestones=[100, 500, 1000], gamma=0.1)
-
-        self.optimizer.load_state_dict(checkpoint['optimizer'])
+        if load_optimizer:
+            self.optimizer.load_state_dict(checkpoint['optimizer'])
         self.scheduler.load_state_dict(checkpoint['scheduler'])
 
-        print('Latest model loaded')
+        print('model ' + filename + ' loaded')
         # print(self.optimizer.state_dict())
         # print(self.scheduler.state_dict())
 
