@@ -120,7 +120,7 @@ if __name__ == "__main__":
     args1 = dotdict({'numMCTSSims': 200, 'cpuct': 1.0})
     mcts1 = MCTS(g, n1, args1, eval=True)
     def n1p(x): return np.random.choice(
-        32*32, p=mcts1.getActionProb(x, temp=1))
+        32*32, p=mcts1.getActionProb(x, temp=0))
 
     # n2 = NNet(g)
     # n2.load_checkpoint('temp/', 'train.pth.tar')
