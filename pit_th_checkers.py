@@ -132,6 +132,9 @@ if __name__ == "__main__":
 
     # player1 = {'func': n1p, 'name': 'NNet'}
     # player2 = {'func': minimax, 'name': 'minimax'}
+    pytorch_total_params = sum(p.numel()
+                               for p in n1.nnet.parameters() if p.requires_grad)
 
+    print('Num trainable params:', pytorch_total_params)
     arena = Arena(n1p, n2p, g, display=display)
     print(arena.playGames(20, verbose=True))
