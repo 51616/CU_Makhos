@@ -82,7 +82,7 @@ def AsyncSelfPlay(nnet, game, args, iter_num):  # , bar
         trainExamples.append([canonicalBoard, curPlayer, pi,
                               game.gameState.turn, game.gameState.stale, valids])
 
-        action = random.choices(np.arange(0, len(pi)), weights=pi)
+        action = random.choices(np.arange(0, len(pi)), weights=pi)[0]
         board, curPlayer = game.getNextState(
             board, curPlayer, action)
 
@@ -129,7 +129,7 @@ def AsyncMinimaxPlay(game, args):
         trainExamples.append([canonicalBoard, curPlayer, pi,
                               game.gameState.turn, game.gameState.stale, valids])
 
-        action = random.choices(np.arange(0, len(pi)), weights=pi)
+        action = random.choices(np.arange(0, len(pi)), weights=pi)[0]
         board, curPlayer = game.getNextState(
             board, curPlayer, action)
 
