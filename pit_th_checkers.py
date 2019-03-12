@@ -112,7 +112,7 @@ if __name__ == "__main__":
     rp = RandomPlayer(g).play
     # gp = GreedyOthelloPlayer(g).play
     # hp = HumanOthelloPlayer(g).play
-    minimax = minimaxAI().get_move
+    minimax = minimaxAI(game=g, depth=5).get_move
     # nnet players
     n1 = NNet(g, gpu_num=0)
     n1.load_checkpoint('/workspace/CU_Makhos/models/',
@@ -128,6 +128,9 @@ if __name__ == "__main__":
     # mcts2 = MCTS(g, n2, args2)
     # def n2p(x): return np.random.choice(
     #     32*32, p=mcts2.getActionProb(x, temp=1))
+
+    # player1 = {'func': n1p, 'name': 'NNet'}
+    # player2 = {'func': minimax, 'name': 'minimax'}
 
     arena = Arena(n1p, minimax, g, display=display)
     print(arena.playGames(2, verbose=True))
