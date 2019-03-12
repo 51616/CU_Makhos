@@ -129,7 +129,7 @@ def AsyncMinimaxPlay(game, args):
         trainExamples.append([canonicalBoard, curPlayer, pi,
                               game.gameState.turn, game.gameState.stale, valids])
 
-        action = np.random.choice(len(pi), p=pi)
+        action = random.choices(np.arange(0, len(pi)), weights=pi)
         board, curPlayer = game.getNextState(
             board, curPlayer, action)
 
