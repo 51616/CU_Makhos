@@ -1,5 +1,6 @@
 import math
 import numpy as np
+import random
 from collections import deque
 EPS = 1e-8
 
@@ -135,7 +136,7 @@ class MCTS():
 
         valids = self.Vs[s]
         cur_best = -float('inf')
-        best_act = -1
+        best_act = []
 
         # pick the action with the highest upper confidence bound
         for a in range(self.game.getActionSize()):
@@ -149,9 +150,13 @@ class MCTS():
 
                 if u > cur_best:
                     cur_best = u
-                    best_act = a
+                    best_act = [a]
+                elif u == cur_best:
+                    best_act.append(a)
 
-        a = best_act
+        a = random.choice(best_act)
+
+        #a = best_act
         next_s, next_player = self.game.getNextState(canonicalBoard, 1, a)
         # print()
         # print('sim board')

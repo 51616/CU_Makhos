@@ -377,6 +377,10 @@ class Coach():
             except Exception as e:
                 print(e)
                 print("Create a new model")
+        pytorch_total_params = sum(p.numel()
+                                   for p in self.nnet.nnet.parameters() if p.requires_grad)
+
+        print('Num trainable params:', pytorch_total_params)
 
         for i in range(self.args.start_iter, self.args.numIters+1):
             if (self.args.numMCTSSims < 400):
