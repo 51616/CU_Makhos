@@ -535,6 +535,7 @@ class Coach():
     def learn_minimax(self):
 
         for i in range(1, self.args.numIters+1):
+            print('------ITER ' + str(i) + '------')
             self.win_count = 0
             self.loss_count = 0
             self.draw_count = 0
