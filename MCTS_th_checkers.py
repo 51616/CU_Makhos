@@ -98,10 +98,8 @@ class MCTS():
             valids = self.game.getValidMoves(canonicalBoard, 1)
             pi, v = self.nnet.predict(
                 boardHistory, self.game.gameState.turn, self.game.gameState.stale, valids)
-            if np.sum(valids) == 1:
-                self.Ps[s] = np.argmax(valids)
 
-            elif is_search_root and not self.eval:
+            if is_search_root and not self.eval:
                 dir_noise = np.random.dirichlet([1]*32*32)
                 self.Ps[s] = 0.75*pi + 0.25*dir_noise
                 # #pi += EPS
