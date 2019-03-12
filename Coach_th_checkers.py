@@ -533,6 +533,11 @@ class Coach():
             # self.parallel_self_test_play(i)
 
     def learn_minimax(self):
+        
+        pytorch_total_params = sum(p.numel()
+                                   for p in self.nnet.nnet.parameters() if p.requires_grad)
+
+        print('Num trainable params:', pytorch_total_params)
 
         for i in range(1, self.args.numIters+1):
             print('------ITER ' + str(i) + '------')

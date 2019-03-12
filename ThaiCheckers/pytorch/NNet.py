@@ -23,7 +23,7 @@ sys.path.append('../../')
 
 
 args = dotdict({
-    'lr': 0.02,
+    'lr': 0.002,
     'dropout': 0.3,
     'epochs': 2,
     'batch_size': 256,  # 4096
