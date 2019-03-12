@@ -25,7 +25,7 @@ class Arena():
         self.player2 = player2
         self.game = game
         self.display = display
-        self.displaybar = True
+        #self.displaybar = True
 
     def playGame(self, verbose=False):
         """

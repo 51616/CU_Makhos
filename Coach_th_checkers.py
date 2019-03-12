@@ -212,17 +212,17 @@ def AsyncAgainst(nnet, game, args, iter_num):
 
     # create nn and load
     minimax = minimaxAI(game)
-    try:
-        nnet.load_checkpoint(folder=args.checkpoint,
-                             filename='train_iter_'+str(iter_num)+'.pth.tar')
-    except:
-        print("load train model fail")
-        pass
-    try:
-        pnet.load_checkpoint(folder=args.checkpoint, filename='best.pth.tar')
-    except:
-        print("load old model fail")
-        pass
+    # try:
+    #     nnet.load_checkpoint(folder=args.checkpoint,
+    #                          filename='train_iter_'+str(iter_num)+'.pth.tar')
+    # except:
+    #     print("load train model fail")
+    #     pass
+    # try:
+    #     pnet.load_checkpoint(folder=args.checkpoint, filename='best.pth.tar')
+    # except:
+    #     print("load old model fail")
+    #     pass
 
     mcts = MCTS(game, nnet, args, eval=True)
 
