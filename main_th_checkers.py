@@ -11,13 +11,13 @@ Before using multiprocessing, please check 2 things before use this script.
 """
 
 args = dotdict({
-    'numIters': 1000,
-    'numEps': 40,  # 25000
+    'numIters': 50,
+    'numEps': 1000,  # 25000
     'tempThreshold': 15,
     'updateThreshold': 0.55,
     'maxlenOfQueue': 200000,
     'numMCTSSims': 100,  # 1600 , 800
-    'arenaCompare': 40,  # 400, 0
+    'arenaCompare': 50,  # 400, 0
     'cpuct': 8,
 
     'multiGPU': True,
