@@ -17,7 +17,7 @@ import torch
 from tqdm import tqdm
 import random
 import copy
-from .utils_examples_global_avg import build_unique_examples
+from utils_examples_global_avg import build_unique_examples
 
 mp = multiprocessing.get_context('spawn')
 
