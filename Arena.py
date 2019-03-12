@@ -52,10 +52,10 @@ class Arena():
                 self.display(board)
 
             boardHistory.append(self.game.getCanonicalForm(board, curPlayer))
-            try:
-                action = players[curPlayer+1](boardHistory)
-            except:
-                action = players[curPlayer+1](boardHistory[-1])
+            # try:
+            action = players[curPlayer+1](boardHistory)
+            # except:
+            #     action = players[curPlayer+1](boardHistory[-1])
 
             valids = self.game.getValidMoves(
                 self.game.getCanonicalForm(board, curPlayer), 1)
