@@ -447,7 +447,7 @@ class Coach():
         print('Num trainable params:', pytorch_total_params)
 
         start_iter = 1
-        if self.args.loadmodel:
+        if self.args.load_model:
             start_iter += self.args.load_iter
             self.args.numMCTSSims += self.args.load_iter
             self.args.numItersForTrainExamplesHistory = min(
