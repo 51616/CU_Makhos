@@ -524,7 +524,7 @@ class Coach():
             self.nnet1.nnet.load_state_dict(self.nnet.nnet.state_dict())
             self.nnet2.nnet.load_state_dict(self.nnet.nnet.state_dict())
             self.nnet3.nnet.load_state_dict(self.nnet.nnet.state_dict())
-
+            self.parallel_self_test_play(i)
             self.trainExamplesHistory.clear()
 
             # self.trainExamplesHistory.append(iterationTrainExamples)
