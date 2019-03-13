@@ -11,8 +11,8 @@ Before using multiprocessing, please check 2 things before use this script.
 """
 
 args = dotdict({
-    'numIters': 50,
-    'numEps': 500,  # 25000
+    'numIters': 500,
+    'numEps': 120,  # 25000
     'tempThreshold': 15,
     'updateThreshold': 0.55,
     'maxlenOfQueue': 200000,
@@ -26,10 +26,10 @@ args = dotdict({
     'numTestPlayPool': 36,
 
     'checkpoint': '/workspace/CU_Makhos/models_minimax/',
-    'load_model': False,
-    'load_iter': 3,  # 160
+    'load_model': True,
+    'load_iter': 35,  # 160
     'load_folder_file': '/workspace/CU_Makhos/models_minimax/',
-    'numItersForTrainExamplesHistory': 20  # 4
+    'numItersForTrainExamplesHistory': 4  # 4
 
 })
 
@@ -42,4 +42,6 @@ if __name__ == "__main__":
     # if args.load_model:
     #print("Load trainExamples from file")
     # c.loadTrainExamples()
-    c.learn_minimax()
+    # c.learn_minimax()
+    # c = Coach(g, args)
+    c.learn()

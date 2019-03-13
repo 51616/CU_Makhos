@@ -550,11 +550,11 @@ class Coach():
 
         print('Num trainable params:', pytorch_total_params)
 
-        start_iter = 1
-        if self.args.load_model:
-            start_iter += self.args.load_iter
+        # start_iter = 1
+        # if self.args.load_model:
+        #     start_iter += self.args.load_iter
 
-        for i in range(start_iter, self.args.numIters+1):
+        for i in range(1, 30):  # hard code for 30 iters
             print('------ITER ' + str(i) + '------')
             self.win_count = 0
             self.loss_count = 0
