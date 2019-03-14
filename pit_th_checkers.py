@@ -112,26 +112,26 @@ if __name__ == "__main__":
     rp = RandomPlayer(g).play
     # gp = GreedyOthelloPlayer(g).play
     # hp = HumanOthelloPlayer(g).play
-    minimax = minimaxAI(game=g, depth=7).get_move
+    minimax = minimaxAI(game=g, depth=5).get_move
     # nnet players
     n1 = NNet(g, gpu_num=0)
-    n1.load_checkpoint('/workspace/CU_Makhos/models/',
-                       'train_iter_199.pth.tar')
-    args1 = dotdict({'numMCTSSims': 100, 'cpuct': 1.0})
+    n1.load_checkpoint('/workspace/CU_Makhos/models_minimax/',
+                       'train_iter_69.pth.tar')
+    args1 = dotdict({'numMCTSSims': 100, 'cpuct': 8.0})
     mcts1 = MCTS(g, n1, args1, eval=True)
     def n1p(x): return np.random.choice(
         32*32, p=mcts1.getActionProb(x, temp=0))
 
-    n2 = NNet(g, gpu_num=0)
-    n2.load_checkpoint('/workspace/CU_Makhos/models/',
-                       'train_iter_100.pth.tar')
-    args2 = dotdict({'numMCTSSims': 100, 'cpuct': 1.0})
-    mcts2 = MCTS(g, n1, args2, eval=True)
-    def n2p(x): return np.random.choice(
-        32*32, p=mcts2.getActionProb(x, temp=0))
+    # n2 = NNet(g, gpu_num=0)
+    # n2.load_checkpoint('/workspace/CU_Makhos/models_minimax/',
+    #                    'train_iter_69.pth.tar')
+    # args2 = dotdict({'numMCTSSims': 100, 'cpuct': 8.0})
+    # mcts2 = MCTS(g, n1, args2, eval=True)
+    # def n2p(x): return np.random.choice(
+    #     32*32, p=mcts2.getActionProb(x, temp=0))
 
     # player1 = {'func': n1p, 'name': 'NNet'}
     # player2 = {'func': minimax, 'name': 'minimax'}
 
-    arena = Arena(minimax, minimax, g, display=display)
+    arena = Arena(n1p, minimax, g, display=display)
     print(arena.playGames(10, verbose=True))
