@@ -46,7 +46,6 @@ def AsyncSelfPlay(nnet, game, args, iter_num):  # , bar
 
     # net = nn(game, (iter_num % 2) + 1)
     # net.nnet.load_state_dict(nnet.nnet.state_dict())
-    
 
     mcts = MCTS(game, nnet, args)
     # try:
@@ -106,7 +105,7 @@ def AsyncSelfPlay(nnet, game, args, iter_num):  # , bar
             #     draw_count += 1
             # else:
             #     win_loss_count += 1
-
+            # del mcts
             return [(x[0], x[2], r*x[1], x[3], x[4], x[5]) for x in trainExamples], r
 
 
@@ -227,8 +226,8 @@ def AsyncAgainst(nnet, game, args, iter_num):
     #     pass
 
     local_args = dotdict({'numMCTSSims': 100, 'cpuct': 1.0})
-    local_args.numMCTSSims = 100
-    local_args.cpuct = 1
+    # local_args.numMCTSSims = 100
+    # local_args.cpuct = 1
     mcts = MCTS(game, nnet, local_args, eval=True)
 
     arena = Arena(lambda x: np.argmax(mcts.getActionProb(x, temp=0)),
@@ -282,7 +281,7 @@ class Coach():
         self.draw_games = []
 
     def parallel_self_play(self):
-        pool = mp.Pool(processes=self.args.numSelfPlayPool)
+        pool = mp.Pool(processes=self.args.numSelfPlayPool, maxtasksperchild=3)
         temp = []
         res = []
         result = []
@@ -531,7 +530,7 @@ class Coach():
             self.nnet3.nnet.load_state_dict(self.nnet.nnet.state_dict())
             self.trainExamplesHistory.clear()
 
-            if i%10==0:
+            if i % 10 == 0:
                 self.parallel_self_test_play(i)
 
             # self.trainExamplesHistory.append(iterationTrainExamples)
