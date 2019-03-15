@@ -12,13 +12,13 @@ Before using multiprocessing, please check 2 things before use this script.
 
 args = dotdict({
     'numIters': 500,
-    'numEps': 250,  # 25000
-    'tempThreshold': 15,
-    'updateThreshold': 0.55,
+    'numEps': 500,  # 25000
+    'tempThreshold': 15,  # not used
+    'updateThreshold': 0.55,  # not used
     'maxlenOfQueue': 200000,
     'numMCTSSims': 100,  # 1600 , 800
     'arenaCompare': 50,  # 400, 0
-    'cpuct': 8,
+    'cpuct': 2,
 
     'multiGPU': True,
     'setGPU': '0',
@@ -27,7 +27,7 @@ args = dotdict({
 
     'checkpoint': '/workspace/CU_Makhos/models_minimax/',
     'load_model': True,
-    'load_iter': 55,  # 160
+    'load_iter': 97,  # 160
     'load_folder_file': '/workspace/CU_Makhos/models_minimax/',
     'numItersForTrainExamplesHistory': 4  # 4
 

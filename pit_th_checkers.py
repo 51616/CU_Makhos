@@ -117,7 +117,7 @@ if __name__ == "__main__":
     n1 = NNet(g, gpu_num=0)
     n1.load_checkpoint('/workspace/CU_Makhos/models_minimax/',
                        'train_iter_69.pth.tar')
-    args1 = dotdict({'numMCTSSims': 100, 'cpuct': 8.0})
+    args1 = dotdict({'numMCTSSims': 100, 'cpuct': 1.0})
     mcts1 = MCTS(g, n1, args1, eval=True)
     def n1p(x): return np.random.choice(
         32*32, p=mcts1.getActionProb(x, temp=0))

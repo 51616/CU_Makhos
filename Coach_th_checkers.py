@@ -18,6 +18,7 @@ from tqdm import tqdm
 import random
 import copy
 from utils_examples_global_avg import build_unique_examples
+from utils import *
 
 mp = multiprocessing.get_context('spawn')
 
@@ -45,6 +46,7 @@ def AsyncSelfPlay(nnet, game, args, iter_num):  # , bar
 
     # net = nn(game, (iter_num % 2) + 1)
     # net.nnet.load_state_dict(nnet.nnet.state_dict())
+    
 
     mcts = MCTS(game, nnet, args)
     # try:
@@ -224,7 +226,10 @@ def AsyncAgainst(nnet, game, args, iter_num):
     #     print("load old model fail")
     #     pass
 
-    mcts = MCTS(game, nnet, args, eval=True)
+    local_args = dotdict({'numMCTSSims': 100, 'cpuct': 1.0})
+    local_args.numMCTSSims = 100
+    local_args.cpuct = 1
+    mcts = MCTS(game, nnet, local_args, eval=True)
 
     arena = Arena(lambda x: np.argmax(mcts.getActionProb(x, temp=0)),
                   minimax.get_move, game)
@@ -524,8 +529,10 @@ class Coach():
             self.nnet1.nnet.load_state_dict(self.nnet.nnet.state_dict())
             self.nnet2.nnet.load_state_dict(self.nnet.nnet.state_dict())
             self.nnet3.nnet.load_state_dict(self.nnet.nnet.state_dict())
-            self.parallel_self_test_play(i)
             self.trainExamplesHistory.clear()
+
+            if i%10==0:
+                self.parallel_self_test_play(i)
 
             # self.trainExamplesHistory.append(iterationTrainExamples)
             # self.train_network(i)

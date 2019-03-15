@@ -14,11 +14,11 @@ class MCTS():
         self.game = game
         self.nnet = nnet
         self.args = args
+        self.eval = eval    # eval mode
         self.Qsa = {}       # stores Q values for s,a (as defined in the paper)
         self.Nsa = {}       # stores #times edge s,a was visited
         self.Ns = {}        # stores #times board s was visited
         self.Ps = {}        # stores initial policy (returned by neural net)
-        self.eval = eval    # eval mode
         self.Es = {}        # stores game.getGameEnded ended for board s
         self.Vs = {}        # stores game.getValidMoves for board s
 
@@ -171,3 +171,11 @@ class MCTS():
         self.Ns[s] += 1
         # print('return end')
         return -v
+
+    def reset_tree(self):
+        self.Qsa = {}       # stores Q values for s,a (as defined in the paper)
+        self.Nsa = {}       # stores #times edge s,a was visited
+        self.Ns = {}        # stores #times board s was visited
+        self.Ps = {}        # stores initial policy (returned by neural net)
+        self.Es = {}        # stores game.getGameEnded ended for board s
+        self.Vs = {}        # stores game.getValidMoves for board s
