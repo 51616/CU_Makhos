@@ -281,7 +281,7 @@ class Coach():
         self.draw_games = []
 
     def parallel_self_play(self):
-        pool = mp.Pool(processes=self.args.numSelfPlayPool, maxtasksperchild=3)
+        pool = mp.Pool(processes=self.args.numSelfPlayPool, maxtasksperchild=5)
         temp = []
         res = []
         result = []

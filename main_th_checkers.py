@@ -22,12 +22,12 @@ args = dotdict({
 
     'multiGPU': True,
     'setGPU': '0',
-    'numSelfPlayPool': 36,
-    'numTestPlayPool': 36,
+    'numSelfPlayPool': 24,
+    'numTestPlayPool': 24,
 
     'checkpoint': '/workspace/CU_Makhos/models_minimax/',
     'load_model': True,
-    'load_iter': 98,  # 160
+    'load_iter': 140,
     'load_folder_file': '/workspace/CU_Makhos/models_minimax/',
     'numItersForTrainExamplesHistory': 4  # 4
 
