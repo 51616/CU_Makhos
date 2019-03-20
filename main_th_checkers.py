@@ -27,7 +27,7 @@ args = dotdict({
 
     'checkpoint': '/workspace/CU_Makhos/models_minimax/',
     'load_model': True,
-    'load_iter': 140,
+    'load_iter': 145,
     'load_folder_file': '/workspace/CU_Makhos/models_minimax/',
     'numItersForTrainExamplesHistory': 4  # 4
 
