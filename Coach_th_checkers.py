@@ -264,11 +264,6 @@ class Coach():
         self.nnet2 = nn(self.game, gpu_num=2)
         self.nnet3 = nn(self.game, gpu_num=3)
 
-        state_dict = self.nnet.nnet.state_dict()
-        self.nnet1.nnet.load_state_dict(state_dict)
-        self.nnet2.nnet.load_state_dict(state_dict)
-        self.nnet3.nnet.load_state_dict(state_dict)
-
         self.trainExamplesHistory = []
         self.checkpoint_iter = 0
 
@@ -450,6 +445,11 @@ class Coach():
 
         print('Num trainable params:', pytorch_total_params)
 
+        state_dict = self.nnet.nnet.state_dict()
+        self.nnet1.nnet.load_state_dict(state_dict)
+        self.nnet2.nnet.load_state_dict(state_dict)
+        self.nnet3.nnet.load_state_dict(state_dict)
+
         start_iter = 1
         if self.args.load_model:
             start_iter += self.args.load_iter
@@ -465,26 +465,6 @@ class Coach():
             print('------ITER ' + str(i) + '------' +
                   '\tMCTS sim:' + str(self.args.numMCTSSims) + '\tIter samples :' + str(self.args.numItersForTrainExamplesHistory))
 
-            # if i > 1:
-            #     try:
-            #         # self.nnet = nn(self.game, gpu_num=0)
-            #         self.nnet.load_checkpoint(
-            #             folder=self.args.checkpoint, filename='train_iter_'+str(self.checkpoint_iter)+'.pth.tar')
-
-            #     except Exception as e:
-            #         print(e)
-            #         print('train_iter_' + str(self.checkpoint_iter) + '.pth.tar')
-            #         print('No checkpoint iter')
-
-            # print('Check weights')
-            # state_dict = self.nnet.nnet.policy.weight.data.cpu().numpy()
-            # state_dict1 = self.nnet1.nnet.policy.weight.data.cpu().numpy()
-            # print(state_dict == state_dict1)
-            # state_dict2 = self.nnet2.nnet.policy.weight.data.cpu().numpy()
-            # print(state_dict == state_dict2)
-            # state_dict3 = self.nnet3.nnet.policy.weight.data.cpu().numpy()
-            # print(state_dict == state_dict3)
-
             self.win_count = 0
             self.loss_count = 0
             self.draw_count = 0
@@ -495,7 +475,7 @@ class Coach():
 
             iterationTrainExamples = deque([], maxlen=self.args.maxlenOfQueue)
 
-            temp = self.parallel_self_play()
+            self.parallel_self_play()
 
             # iterationTrainExamples += temp
             iterationTrainExamples += self.win_games
