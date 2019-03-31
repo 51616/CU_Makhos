@@ -21,7 +21,7 @@ args = dotdict({
     'cpuct': 2,
 
     'multiGPU': True,
-    'setGPU': '0',
+    'setGPU': '1',
     'numSelfPlayPool': 36,
     'numTestPlayPool': 36,
 
@@ -35,7 +35,7 @@ args = dotdict({
 
 if __name__ == "__main__":
 
-    os.environ["CUDA_VISIBLE_DEVICES"] = "1,2,3"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"
     #os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
     g = Game()
     c = Coach(g, args)
