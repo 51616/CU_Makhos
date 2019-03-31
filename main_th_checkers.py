@@ -22,12 +22,12 @@ args = dotdict({
 
     'multiGPU': True,
     'setGPU': '0',
-    'numSelfPlayPool': 30,
-    'numTestPlayPool': 30,
+    'numSelfPlayPool': 36,
+    'numTestPlayPool': 36,
 
     'checkpoint': '/workspace/CU_Makhos/models_minimax/',
     'load_model': True,
-    'load_iter': 145,
+    'load_iter': 207,
     'load_folder_file': '/workspace/CU_Makhos/models_minimax/',
     'numItersForTrainExamplesHistory': 4  # 4
 
@@ -35,7 +35,7 @@ args = dotdict({
 
 if __name__ == "__main__":
 
-    os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "1,2,3"
     #os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
     g = Game()
     c = Coach(g, args)

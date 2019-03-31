@@ -259,7 +259,7 @@ class Coach():
     def __init__(self, game, args):
         self.game = game
         self.args = args
-        self.nnet = nn(game, gpu_num=0)
+        #self.nnet = nn(game, gpu_num=0)
         self.nnet1 = nn(self.game, gpu_num=1)
         self.nnet2 = nn(self.game, gpu_num=2)
         self.nnet3 = nn(self.game, gpu_num=3)
@@ -415,9 +415,9 @@ class Coach():
 
         # print("Start train network")
 
-        torch.cuda.set_device('cuda:0')
+        torch.cuda.set_device('cuda:1')
 
-        TrainNetwork(self.nnet, self.game, self.args,
+        TrainNetwork(self.nnet1, self.game, self.args,
                      iter_num, self.trainExamplesHistory)
 
     def learn(self):
@@ -431,7 +431,7 @@ class Coach():
 
         if self.args.load_model:
             try:
-                self.nnet.load_checkpoint(
+                self.nnet1.load_checkpoint(
                     folder=self.args.checkpoint, filename='train_iter_'+str(self.args.load_iter)+'.pth.tar')
                 # self.nnet1.load_state_dict(self.nnet.state_dict())
                 # self.nnet2.load_state_dict(self.nnet.state_dict())
@@ -441,12 +441,12 @@ class Coach():
                 print("Create a new model")
 
         pytorch_total_params = sum(p.numel()
-                                   for p in self.nnet.nnet.parameters() if p.requires_grad)
+                                   for p in self.nnet1.nnet.parameters() if p.requires_grad)
 
         print('Num trainable params:', pytorch_total_params)
 
-        state_dict = self.nnet.nnet.state_dict()
-        self.nnet1.nnet.load_state_dict(state_dict)
+        state_dict = self.nnet1.nnet.state_dict()
+        # self.nnet1.nnet.load_state_dict(state_dict)
         self.nnet2.nnet.load_state_dict(state_dict)
         self.nnet3.nnet.load_state_dict(state_dict)
 
@@ -505,9 +505,9 @@ class Coach():
 
             self.trainExamplesHistory.append(iterationTrainExamples)
             self.train_network(i)
-            self.nnet1.nnet.load_state_dict(self.nnet.nnet.state_dict())
-            self.nnet2.nnet.load_state_dict(self.nnet.nnet.state_dict())
-            self.nnet3.nnet.load_state_dict(self.nnet.nnet.state_dict())
+            # self.nnet1.nnet.load_state_dict(self.nnet.nnet.state_dict())
+            self.nnet2.nnet.load_state_dict(self.nnet1.nnet.state_dict())
+            self.nnet3.nnet.load_state_dict(self.nnet1.nnet.state_dict())
             self.trainExamplesHistory.clear()
 
             if i % 10 == 0:
@@ -522,7 +522,7 @@ class Coach():
 
         if self.args.load_model:
             try:
-                self.nnet.load_checkpoint(
+                self.nnet1.load_checkpoint(
                     folder=self.args.checkpoint, filename='train_iter_'+str(self.args.load_iter)+'.pth.tar')
                 # self.nnet1.load_state_dict(self.nnet.state_dict())
                 # self.nnet2.load_state_dict(self.nnet.state_dict())
@@ -532,7 +532,7 @@ class Coach():
                 print("Create a new model")
 
         pytorch_total_params = sum(p.numel()
-                                   for p in self.nnet.nnet.parameters() if p.requires_grad)
+                                   for p in self.nnet1.nnet.parameters() if p.requires_grad)
 
         print('Num trainable params:', pytorch_total_params)
 
@@ -566,8 +566,8 @@ class Coach():
 
             self.trainExamplesHistory.append(iterationTrainExamples)
             self.train_network(i)
-            self.nnet1.nnet.load_state_dict(self.nnet.nnet.state_dict())
-            self.nnet2.nnet.load_state_dict(self.nnet.nnet.state_dict())
-            self.nnet3.nnet.load_state_dict(self.nnet.nnet.state_dict())
+            # self.nnet1.nnet.load_state_dict(self.nnet.nnet.state_dict())
+            self.nnet2.nnet.load_state_dict(self.nnet1.nnet.state_dict())
+            self.nnet3.nnet.load_state_dict(self.nnet1.nnet.state_dict())
             self.parallel_self_test_play(i)
             self.trainExamplesHistory.clear()
