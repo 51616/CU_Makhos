@@ -30,15 +30,15 @@ def AsyncSelfPlay(nnet, game, args, iter_num):  # , bar
 
     # set gpu
     if(args.multiGPU):
-        if(iter_num % 3 == 0):
+        if(iter_num % 2 == 0):
             #os.environ["CUDA_VISIBLE_DEVICES"] = '1'
-            torch.cuda.device('cuda:1')
-        elif (iter_num % 3 == 1):
+            torch.cuda.device('cuda:3')
+        else :
             #os.environ["CUDA_VISIBLE_DEVICES"] = '2'
             torch.cuda.device('cuda:2')
-        else:
+        #else:
             #os.environ["CUDA_VISIBLE_DEVICES"] = '3'
-            torch.cuda.device('cuda:3')
+            #torch.cuda.device('cuda:3')
     else:
         os.environ["CUDA_VISIBLE_DEVICES"] = args.setGPU
 
@@ -199,15 +199,15 @@ def AsyncAgainst(nnet, game, args, iter_num):
 
     # set gpu
     if(args.multiGPU):
-        if(iter_num % 3 == 0):
+        if(iter_num % 2 == 0):
             #os.environ["CUDA_VISIBLE_DEVICES"] = '1'
-            torch.cuda.device('cuda:1')
-        elif (iter_num % 3 == 1):
+            torch.cuda.device('cuda:3')
+        else:
             #os.environ["CUDA_VISIBLE_DEVICES"] = '2'
             torch.cuda.device('cuda:2')
-        else:
+        #else:
             #os.environ["CUDA_VISIBLE_DEVICES"] = '3'
-            torch.cuda.device('cuda:3')
+            #torch.cuda.device('cuda:3')
     else:
         os.environ["CUDA_VISIBLE_DEVICES"] = args.setGPU
 
@@ -260,9 +260,9 @@ class Coach():
         self.game = game
         self.args = args
         #self.nnet = nn(game, gpu_num=0)
-        self.nnet1 = nn(self.game, gpu_num=1)
-        self.nnet2 = nn(self.game, gpu_num=2)
-        self.nnet3 = nn(self.game, gpu_num=3)
+        self.nnet1 = nn(self.game, gpu_num=3)
+        #self.nnet2 = nn(self.game, gpu_num=2)
+        #self.nnet3 = nn(self.game, gpu_num=3)
 
         self.trainExamplesHistory = []
         self.checkpoint_iter = 0
@@ -276,7 +276,7 @@ class Coach():
         self.draw_games = []
 
     def parallel_self_play(self):
-        pool = mp.Pool(processes=self.args.numSelfPlayPool, maxtasksperchild=3)
+        pool = mp.Pool(processes=self.args.numSelfPlayPool, maxtasksperchild=1)
         temp = []
         res = []
         result = []
@@ -287,12 +287,13 @@ class Coach():
         # bar = Bar('Self Play', max=self.args.numEps)
         # bar = tqdm(total=self.args.numEps)
         for i in range(self.args.numEps):
-            if i % 3 == 0:
-                net = self.nnet1
-            elif i % 3 == 1:
-                net = self.nnet2
-            else:
-                net = self.nnet3
+            net = self.nnet1
+            #if i % 2 == 0:
+            #    net = self.nnet1
+            #else:
+            #    net = self.nnet2
+            #else:
+            #    net = self.nnet3
 
             res.append(pool.apply_async(AsyncSelfPlay, args=(
                 net, self.game, self.args, i)))
@@ -372,17 +373,18 @@ class Coach():
         return temp
 
     def parallel_self_test_play(self, iter_num):
-        pool = mp.Pool(processes=self.args.numTestPlayPool)
+        pool = mp.Pool(processes=self.args.numTestPlayPool, maxtasksperchild=1)
 
         res = []
         result = []
         for i in range(self.args.arenaCompare):
-            if i % 3 == 0:
-                net = self.nnet1
-            elif i % 3 == 1:
-                net = self.nnet2
-            else:
-                net = self.nnet3
+            net = self.nnet1
+	          #if i % 2 == 0:
+            #    net = self.nnet1
+            #else :
+            #    net = self.nnet2
+            #else:
+            #    net = self.nnet3
 
             res.append(pool.apply_async(
                 AsyncAgainst, args=(net, self.game, self.args, i)))
@@ -415,7 +417,7 @@ class Coach():
 
         # print("Start train network")
 
-        torch.cuda.set_device('cuda:1')
+        torch.cuda.set_device('cuda:3')
 
         TrainNetwork(self.nnet1, self.game, self.args,
                      iter_num, self.trainExamplesHistory)
@@ -445,10 +447,10 @@ class Coach():
 
         print('Num trainable params:', pytorch_total_params)
 
-        state_dict = self.nnet1.nnet.state_dict()
+        #state_dict = self.nnet1.nnet.state_dict()
         # self.nnet1.nnet.load_state_dict(state_dict)
-        self.nnet2.nnet.load_state_dict(state_dict)
-        self.nnet3.nnet.load_state_dict(state_dict)
+        #self.nnet2.nnet.load_state_dict(state_dict)
+        # self.nnet3.nnet.load_state_dict(state_dict)
 
         start_iter = 1
         if self.args.load_model:
@@ -506,8 +508,8 @@ class Coach():
             self.trainExamplesHistory.append(iterationTrainExamples)
             self.train_network(i)
             # self.nnet1.nnet.load_state_dict(self.nnet.nnet.state_dict())
-            self.nnet2.nnet.load_state_dict(self.nnet1.nnet.state_dict())
-            self.nnet3.nnet.load_state_dict(self.nnet1.nnet.state_dict())
+            #self.nnet2.nnet.load_state_dict(self.nnet1.nnet.state_dict())
+            #self.nnet3.nnet.load_state_dict(self.nnet1.nnet.state_dict())
             self.trainExamplesHistory.clear()
 
             if i % 10 == 0:

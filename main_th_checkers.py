@@ -20,14 +20,14 @@ args = dotdict({
     'arenaCompare': 50,  # 400, 0
     'cpuct': 2,
 
-    'multiGPU': True,
-    'setGPU': '1',
-    'numSelfPlayPool': 36,
-    'numTestPlayPool': 36,
+    'multiGPU': False,
+    'setGPU': '3',
+    'numSelfPlayPool': 30,
+    'numTestPlayPool': 30,
 
     'checkpoint': '/workspace/CU_Makhos/models_minimax/',
     'load_model': True,
-    'load_iter': 218,
+    'load_iter': 263,
     'load_folder_file': '/workspace/CU_Makhos/models_minimax/',
     'numItersForTrainExamplesHistory': 4  # 4
 
