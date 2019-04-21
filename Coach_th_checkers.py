@@ -447,6 +447,10 @@ class Coach():
 
         print('Num trainable params:', pytorch_total_params)
 
+        print('LR:')
+        for param_group in self.nnet1.optimizer.param_groups:
+            print(param_group['lr'])
+
         #state_dict = self.nnet1.nnet.state_dict()
         # self.nnet1.nnet.load_state_dict(state_dict)
         #self.nnet2.nnet.load_state_dict(state_dict)
