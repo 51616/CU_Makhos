@@ -2,5 +2,3 @@
 __pycache__/
 
 models_minimax/
-
-pytorch_classification/
