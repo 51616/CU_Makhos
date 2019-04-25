@@ -52,3 +52,9 @@ def index_to_move(idx):
 		end_y = end_y * 2
 
 	return ((start_x, start_y),(end_x, end_y))
+
+def index_to_move_human(idx):
+	d = {0:'a',1:'b',2:'c',3:'d',4:'e',5:'f',6:'g',7:'h'}
+
+	((start_x, start_y),(end_x, end_y)) = index_to_move(idx)
+	return ((start_x+1,d[start_y]),(end_x+1,d[end_y]))

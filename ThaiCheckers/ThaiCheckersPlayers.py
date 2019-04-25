@@ -44,7 +44,7 @@ class HumanThaiCheckersPlayer():
 
 class minimaxAI:
 
-    def __init__(self, game, side=1, depth=5):
+    def __init__(self, game, side=1, depth=5, verbose=False):
         #self.total_time_elapsed = 0
         #self.skipping_point = None
         #self.pruned = 0
@@ -52,24 +52,36 @@ class minimaxAI:
         self.side = side
         self.depth = depth
         self.game = game
+        self.states_visited = 0
+        self.verbose = verbose
 
     def set_side(self, side=1):
         self.side = side
 
     def get_move(self, checkers):
+        #carnonical_board = self.game.getCanonicalForm(checkers,)
         board = Board(
             checkers, 1, self.game.gameState.turn, self.game.gameState.stale)
         #self.num_move_called += 1
         #start_time = time.time()
-        possible_moves = self.minimax_start(board, self.depth, True)
+        self.states_visited += 1
+        if self.side==1:
+            possible_moves = self.minimax_start(board, self.depth, True)
+        else:
+            possible_moves = self.minimax_start(board, self.depth, False)
         #self.total_time_elapsed += time.time() - start_time
+        if self.verbose:
+            print('Minimax States visited:',self.states_visited)
         return move_to_index(choice(possible_moves))
 
     def get_pi(self, checkers):
         board = Board(
             checkers, 1, self.game.gameState.turn, self.game.gameState.stale)
 
-        possible_moves = self.minimax_start(board, self.depth, True)
+        if self.side==1:
+            possible_moves = self.minimax_start(board, self.depth, True)
+        else:
+            possible_moves = self.minimax_start(board, self.depth, False)
 
         # return move_to_index(choice(start_point, end_point))
         pi = np.zeros((32*32))
@@ -112,6 +124,7 @@ class minimaxAI:
         return possible_moves  # [randint(0, len(possible_moves) - 1)]
 
     def minimax(self, checkers, depth, maximizing_player, alpha, beta):
+        self.states_visited += 1
         if depth == 0:
             return self.get_heuristic(checkers)
 

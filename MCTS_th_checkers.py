@@ -10,10 +10,12 @@ class MCTS():
     This class handles the MCTS tree.
     """
 
-    def __init__(self, game, nnet, args, eval=False):
+    def __init__(self, game, nnet, args, eval=False, verbose=False):
         self.game = game
         self.nnet = nnet
         self.args = args
+        self.verbose = verbose
+        self.states_visited = 0
         self.eval = eval    # eval mode
         self.Qsa = {}       # stores Q values for s,a (as defined in the paper)
         self.Nsa = {}       # stores #times edge s,a was visited
@@ -34,6 +36,7 @@ class MCTS():
         # print('len getprob:', len(boardHistory))
         cur_move = self.game.gameState.turn
         cur_stale = self.game.gameState.stale
+        self.state_visits = 0
         for i in range(self.args.numMCTSSims):
             self.search(boardHistory, is_search_root=True)
             self.game.gameState.turn = cur_move
@@ -43,11 +46,20 @@ class MCTS():
         # print('string rep:',s)
         counts = [self.Nsa[(s, a)] if (
             s, a) in self.Nsa else 0 for a in range(self.game.getActionSize())]
+        
+        
 
         if temp == 0:
             bestA = np.argmax(counts)
             probs = [0]*len(counts)
             probs[bestA] = 1
+            if self.verbose:
+                try:
+                    print('MCTS States visited:',self.states_visited)
+                    print('Win confidence for current board:' +  str( round( (0.5 + self.Qsa[(s,bestA)][0]/2)*100,2) ) + '%')
+                except:
+                    pass
+                print((self.game.gameState.turn, self.game.gameState.stale))
             return probs
 
         counts = [x**(1./temp) for x in counts]
@@ -76,6 +88,7 @@ class MCTS():
         # print('canonicalBoard')
         # print(canonicalBoard)
         # print()
+        self.states_visited += 1
         s = self.game.stringRepresentation(boardHistory)
         canonicalBoard = boardHistory
         if s not in self.Es:
@@ -99,6 +112,7 @@ class MCTS():
             valids = self.game.getValidMoves(canonicalBoard, 1)
             self.Ps[s], v = self.nnet.predict(
                 boardHistory, self.game.gameState.turn, self.game.gameState.stale, valids)
+            
 
             # valids = self.game.getValidMoves(canonicalBoard, 1)
             # self.Ps[s] = self.Ps[s]*valids      # masking invalid moves

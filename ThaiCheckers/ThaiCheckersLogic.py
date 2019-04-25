@@ -100,11 +100,11 @@ class Board():
                 elif tmp_board[i][j] == -3:
                     tmp_board[i][j] = 4
         print(end='   ')
-        for col in range(8):
+        for col in ['a','b','c','d','e','f','g','h']:
             print(col, end=' ')
         print()
         for row in range(8):
-            print(row, tmp_board[row])
+            print(row+1, tmp_board[row])
         print()
 
     # Reset the game
