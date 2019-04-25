@@ -48,9 +48,11 @@ def parallel_self_test_play(iter_num):
 
     res = []
     result = []
+    net = nn(GAME, gpu_num=3)
+    net.load_checkpoint(folder='/workspace/CU_Makhos/models_minimax/', filename='train_iter_'+str(iter_num)+'.pth.tar')
+
     for i in range(GAME_NUM):
-        net = nn(GAME, gpu_num=3)
-        net.load_checkpoint(folder='/workspace/CU_Makhos/models_minimax/', filename='train_iter_'+str(iter_num)+'.pth.tar')
+        
         res.append(pool.apply_async(
             AsyncAgainst, args=(net, Game(), None, i)))
     pool.close()
@@ -70,5 +72,6 @@ def parallel_self_test_play(iter_num):
             str(nwins)+"\tDraws: "+str(draws))
 
 if __name__=='__main__':
-    for iter_num in [i*10 for i in range(1,27)]:
+    iters = [i*10 for i in range(1,27)]
+    for iter_num in iters:
         parallel_self_test_play(iter_num)
