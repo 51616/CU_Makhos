@@ -39,9 +39,5 @@ if __name__ == "__main__":
     #os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
     g = Game()
     c = Coach(g, args)
-    # if args.load_model:
-    #print("Load trainExamples from file")
-    # c.loadTrainExamples()
     # c.learn_minimax()
-    # c = Coach(g, args)
     c.learn()

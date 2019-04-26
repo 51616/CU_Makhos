@@ -23,7 +23,7 @@ sys.path.append('../../')
 
 
 args = dotdict({
-    'lr': 0.002,
+    'lr': 0.001,
     'dropout': 0.3,
     'epochs': 2,
     'batch_size': 256,  # 4096
@@ -51,8 +51,8 @@ class NNetWrapper(NeuralNet):
         self.action_size = game.getActionSize()
         self.optimizer = optim.Adam(
             self.nnet.parameters(), lr=args.lr, weight_decay=0.0001)
-        self.scheduler = torch.optim.lr_scheduler.MultiStepLR(
-            self.optimizer, milestones=[100, 150, 200, 250, 300], gamma=0.5)
+        # self.scheduler = torch.optim.lr_scheduler.MultiStepLR(
+        #     self.optimizer, milestones=[100, 150, 200, 250, 300], gamma=0.5)
         self.min_batch_size = 100
         # if args.cuda:
         #     self.nnet.cuda()
@@ -65,7 +65,7 @@ class NNetWrapper(NeuralNet):
         examples: list of examples, each example is of form (board, pi, v)
         """
 
-        self.scheduler.step()
+        # self.scheduler.step()
         self.nnet.train()
         for epoch in range(args.epochs):
             # random.sample(past_examples, len(past_examples)//8)
@@ -250,8 +250,8 @@ class NNetWrapper(NeuralNet):
             print("Checkpoint Directory exists! ")
         torch.save({
             'state_dict': self.nnet.state_dict(),
-            'optimizer': self.optimizer.state_dict(),
-            'scheduler': self.scheduler.state_dict()
+            'optimizer': self.optimizer.state_dict()
+            # 'scheduler': self.scheduler.state_dict()
         }, filepath)
 
     def load_checkpoint(self, folder='checkpoint', filename='checkpoint.pth.tar', load_optimizer=True):
@@ -273,7 +273,7 @@ class NNetWrapper(NeuralNet):
         #     self.optimizer, milestones=[100, 500, 1000], gamma=0.1)
         if load_optimizer:
             self.optimizer.load_state_dict(checkpoint['optimizer'])
-        self.scheduler.load_state_dict(checkpoint['scheduler'])
+        # self.scheduler.load_state_dict(checkpoint['scheduler'])
 
         print('model ' + filename + ' loaded')
         # print(self.optimizer.state_dict())

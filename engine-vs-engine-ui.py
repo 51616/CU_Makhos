@@ -35,7 +35,7 @@ if args.player1 == 'minimax':
 else:
     nnet = nn(checkers, gpu_num=0)
     nnet.load_checkpoint(folder='models_minimax', filename='train_iter_268.pth.tar')
-    args1 = dotdict({'numMCTSSims':200, 'cpuct': 1.0})
+    args1 = dotdict({'numMCTSSims':100, 'cpuct': 1.0})
     AI_1 = MCTS(checkers, nnet, args1, eval=True, verbose=True)
 
 if args.player2 == 'minimax':
@@ -44,7 +44,7 @@ if args.player2 == 'minimax':
 else:
     nnet2 = nn(checkers, gpu_num=0)
     nnet2.load_checkpoint(folder='models_minimax', filename='train_iter_268.pth.tar')
-    args2 = dotdict({'numMCTSSims':200, 'cpuct': 1.0})
+    args2 = dotdict({'numMCTSSims':100, 'cpuct': 1.0})
     AI_2 = MCTS(checkers, nnet2, args2, eval=True, verbose=True) 
     
 

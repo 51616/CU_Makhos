@@ -19,6 +19,8 @@ import random
 import copy
 from utils_examples_global_avg import build_unique_examples
 from utils import *
+import shutil
+
 
 mp = multiprocessing.get_context('spawn')
 
@@ -141,7 +143,7 @@ def AsyncMinimaxPlay(game, args):
             return [(x[0], x[2], r*x[1], x[3], x[4], x[5]) for x in trainExamples], r
 
 
-def TrainNetwork(nnet, game, args, iter_num, trainhistory):
+def TrainNetwork(nnet, game, args, iter_num, trainhistory, train_net=True):
     # set gpu
     # os.environ["CUDA_VISIBLE_DEVICES"] = args.setGPU
     # create network for training
@@ -150,12 +152,18 @@ def TrainNetwork(nnet, game, args, iter_num, trainhistory):
     #     nnet.load_checkpoint(folder=args.checkpoint, filename='best.pth.tar')
     # except:
     #     pass
+
+    
+
     # ---load history file---
+    
     modelFile = os.path.join(args.checkpoint, "trainhistory.pth.tar")
     examplesFile = modelFile+".examples"
     if not os.path.isfile(examplesFile):
         print('Train history not found')
     else:
+        #make a backup
+        shutil.copy2(examplesFile, examplesFile+'.tmp')
         # print("File with trainExamples found. Read it.")
         old_history = pickle.load(open(examplesFile, "rb"))
         for iter_samples in old_history:
@@ -169,15 +177,7 @@ def TrainNetwork(nnet, game, args, iter_num, trainhistory):
         #del trainhistory[len(trainhistory)-1]
         trainhistory = trainhistory[:args.numItersForTrainExamplesHistory]
         print('Length after remove:', len(trainhistory))
-    # -------------------
-    # ---extend history---
-    trainExamples = build_unique_examples(trainhistory)
 
-    # trainExamples = []
-    # for e in unique_train_history:
-    #     trainExamples.extend(e)
-    shuffle(trainExamples)
-    print('Total train samples (moves):', len(trainExamples))
     # ---save history---
     folder = args.checkpoint
     if not os.path.exists(folder):
@@ -189,10 +189,14 @@ def TrainNetwork(nnet, game, args, iter_num, trainhistory):
     #     Pickler(f).dump(trainhistory)
     #     # f.closed
     # ------------------
-    nnet.train(trainExamples)
+    if train_net:
+        trainExamples = build_unique_examples(trainhistory)
+        shuffle(trainExamples)
+        print('Total train samples (moves):', len(trainExamples))
 
-    nnet.save_checkpoint(folder=args.checkpoint,
-                         filename='train_iter_' + str(iter_num) + '.pth.tar')
+        nnet.train(trainExamples)
+        nnet.save_checkpoint(folder=args.checkpoint,
+                            filename='train_iter_' + str(iter_num) + '.pth.tar')
 
 
 def AsyncAgainst(nnet, game, args, iter_num):
@@ -413,14 +417,14 @@ class Coach():
         # CheckResultAndSaveNetwork(
         #     pwins, nwins, draws, self.nnet, self.game, self.args, iter_num)
 
-    def train_network(self, iter_num):
+    def train_network(self, iter_num, train_net=True):
 
         # print("Start train network")
 
         torch.cuda.set_device('cuda:3')
 
         TrainNetwork(self.nnet1, self.game, self.args,
-                     iter_num, self.trainExamplesHistory)
+                     iter_num, self.trainExamplesHistory, train_net)
 
     def learn(self):
         """
@@ -573,7 +577,110 @@ class Coach():
             self.trainExamplesHistory.append(iterationTrainExamples)
             self.train_network(i)
             # self.nnet1.nnet.load_state_dict(self.nnet.nnet.state_dict())
-            self.nnet2.nnet.load_state_dict(self.nnet1.nnet.state_dict())
-            self.nnet3.nnet.load_state_dict(self.nnet1.nnet.state_dict())
+            # self.nnet2.nnet.load_state_dict(self.nnet1.nnet.state_dict())
+            # self.nnet3.nnet.load_state_dict(self.nnet1.nnet.state_dict())
             self.parallel_self_test_play(i)
             self.trainExamplesHistory.clear()
+
+
+    def learn_rerun(self):
+        """
+        Performs numIters iterations with numEps episodes of self-play in each
+        iteration. After every iteration, it retrains neural network with
+        examples in trainExamples (which has a maximium length of maxlenofQueue).
+        It then pits the new neural network against the old one and accepts it
+        only if it wins >= updateThreshold fraction of games.
+        """
+
+        if self.args.load_model:
+            try:
+                self.nnet1.load_checkpoint(
+                    folder=self.args.checkpoint, filename='train_iter_'+str(self.args.load_iter)+'.pth.tar')
+                # self.nnet1.load_state_dict(self.nnet.state_dict())
+                # self.nnet2.load_state_dict(self.nnet.state_dict())
+
+            except Exception as e:
+                print(e)
+                print("Create a new model")
+
+        pytorch_total_params = sum(p.numel()
+                                   for p in self.nnet1.nnet.parameters() if p.requires_grad)
+
+        print('Num trainable params:', pytorch_total_params)
+
+        print('LR:')
+        for param_group in self.nnet1.optimizer.param_groups:
+            print(param_group['lr'])
+
+        #state_dict = self.nnet1.nnet.state_dict()
+        # self.nnet1.nnet.load_state_dict(state_dict)
+        #self.nnet2.nnet.load_state_dict(state_dict)
+        # self.nnet3.nnet.load_state_dict(state_dict)
+
+        start_iter = 1
+        if self.args.load_model:
+            start_iter += self.args.load_iter
+            self.args.numMCTSSims += self.args.load_iter
+            self.args.numItersForTrainExamplesHistory = min(
+                20, 4 + (self.args.load_iter-4)//2)
+
+        for i in range(start_iter, self.args.numIters+1):
+            if (self.args.numMCTSSims < 400):
+                self.args.numMCTSSims += 1
+            if ((i > 5) and (i % 2 == 0) and (self.args.numItersForTrainExamplesHistory < 20)):
+                self.args.numItersForTrainExamplesHistory += 1
+            print('------ITER ' + str(i) + '------' +
+                  '\tMCTS sim:' + str(self.args.numMCTSSims) + '\tIter samples :' + str(self.args.numItersForTrainExamplesHistory))
+
+            self.win_count = 0
+            self.loss_count = 0
+            self.draw_count = 0
+
+            self.win_games = []
+            self.loss_games = []
+            self.draw_games = []
+
+            iterationTrainExamples = deque([], maxlen=self.args.maxlenOfQueue)
+
+            self.parallel_self_play()
+
+            # iterationTrainExamples += temp
+            iterationTrainExamples += self.win_games
+            iterationTrainExamples += self.loss_games
+
+            print('Win count:', self.win_count, 'Loss count:',
+                  self.loss_count, 'Draw count:', self.draw_count)
+
+            self.checkpoint_iter = i
+
+            # games = []
+            # games += self.win_games
+            # games += self.loss_games
+
+            if self.draw_count <= (self.win_count + self.loss_count):
+                iterationTrainExamples += self.draw_games
+
+            else:
+                win_loss_count = len(self.win_games) + len(self.loss_games)
+
+                sample_draw_games = random.sample(
+                    self.draw_games, win_loss_count)  # get samples from draw games
+
+                iterationTrainExamples += sample_draw_games
+                print('Too much draw, add all win/loss games and ',
+                      str(win_loss_count), ' draw moves')
+
+            self.trainExamplesHistory.append(iterationTrainExamples)
+            self.train_network(i,train_net=False)
+            # self.nnet1.nnet.load_state_dict(self.nnet.nnet.state_dict())
+            #self.nnet2.nnet.load_state_dict(self.nnet1.nnet.state_dict())
+            #self.nnet3.nnet.load_state_dict(self.nnet1.nnet.state_dict())
+            self.trainExamplesHistory.clear()
+
+            # if i % 10 == 0:
+            #     self.parallel_self_test_play(i)
+
+            # self.trainExamplesHistory.append(iterationTrainExamples)
+            # self.train_network(i)
+            # self.trainExamplesHistory.clear()
+            # self.parallel_self_test_play(i)
