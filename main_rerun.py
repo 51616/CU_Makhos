@@ -40,7 +40,8 @@ if __name__ == "__main__":
     g = Game()
     c = Coach(g, args)
     # c.learn_minimax()
-    for i in range(20):
+    for i in range(19):
         args.load_iter += i
         c.learn_rerun()
+    args.load_iter += i
     c.learn()
