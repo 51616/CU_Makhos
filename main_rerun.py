@@ -41,7 +41,7 @@ if __name__ == "__main__":
     c = Coach(g, args)
     # c.learn_minimax()
     for i in range(19):
-        c.args.load_iter += i
+        c.args.load_iter += 1
         c.learn_rerun()
-    c.args.load_iter += i
+    c.args.load_iter += 1
     c.learn()
