@@ -624,7 +624,7 @@ class Coach():
             self.args.numItersForTrainExamplesHistory = min(
                 20, 4 + (self.args.load_iter-4)//2)
 
-        for i in range(start_iter, self.args.numIters+1):
+        for i in range(start_iter, start_iter+1):
             if (self.args.numMCTSSims < 400):
                 self.args.numMCTSSims += 1
             if ((i > 5) and (i % 2 == 0) and (self.args.numItersForTrainExamplesHistory < 20)):
