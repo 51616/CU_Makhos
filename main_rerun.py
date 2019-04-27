@@ -27,7 +27,7 @@ args = dotdict({
 
     'checkpoint': '/workspace/CU_Makhos/models_rerun/',
     'load_model': True,
-    'load_iter': 121,
+    'load_iter': 120,
     'load_folder_file': '/workspace/CU_Makhos/models_rerun/',
     'numItersForTrainExamplesHistory': 4  # 4
 
@@ -41,7 +41,7 @@ if __name__ == "__main__":
     c = Coach(g, args)
     # c.learn_minimax()
     for i in range(19):
-        args.load_iter += i
+        c.args.load_iter += i
         c.learn_rerun()
-    args.load_iter += i
+    c.args.load_iter += i
     c.learn()
