@@ -39,10 +39,11 @@ if __name__ == "__main__":
     #os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
     g = Game()
     c = Coach(g, args)
-    # c.learn_minimax()
-    for i in range(19):
-        c.args.numMCTSSims = 100
-        c.args.load_iter += 1
-        c.learn_rerun()
-    c.args.load_iter += 1
+    c.learn_minimax()
+    # for i in range(19):
+    #     c.args.numMCTSSims = 100
+    #     c.args.load_iter += 1
+    #     c.learn_rerun()
+    # c.args.load_iter += 1
+    c.args.load_iter = 30
     c.learn()

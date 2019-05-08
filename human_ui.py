@@ -80,18 +80,30 @@ def draw_pieces(canvas, checkers):
         for col in range(8):
             x = col * 60
             y = row * 60 
-            
-            if board[row, col] == checkers.gameState.PLAYER_1:
-                canvas.create_oval(x+10, y+10, x + 50, y + 50, fill='white', tags='piece')
-            elif board[row, col] == checkers.gameState.PLAYER_2:
-                canvas.create_oval(x+10, y+10, x + 50, y + 50, fill='black', tags='piece')
+            if args.player2:
+                if board[row, col] == checkers.gameState.PLAYER_1:
+                    canvas.create_oval(x+10, y+10, x + 50, y + 50, fill='white', tags='piece')
+                elif board[row, col] == checkers.gameState.PLAYER_2:
+                    canvas.create_oval(x+10, y+10, x + 50, y + 50, fill='black', tags='piece')
 
-            elif board[row, col] == checkers.gameState.PLAYER_1_KING:
-                canvas.create_oval(x+10, y+10, x + 50, y + 50, fill='white', tags='piece')
-                canvas.create_oval(x + 15, y + 15, x + 45, y + 45, fill='yellow', tags='piece')
-            elif board[row, col] == checkers.gameState.PLAYER_2_KING:
-                canvas.create_oval(x+10, y+10, x + 50, y + 50, fill='black', tags='piece')
-                canvas.create_oval(x + 15, y + 15, x + 45, y + 45, fill='yellow', tags='piece')
+                elif board[row, col] == checkers.gameState.PLAYER_1_KING:
+                    canvas.create_oval(x+10, y+10, x + 50, y + 50, fill='white', tags='piece')
+                    canvas.create_oval(x + 15, y + 15, x + 45, y + 45, fill='yellow', tags='piece')
+                elif board[row, col] == checkers.gameState.PLAYER_2_KING:
+                    canvas.create_oval(x+10, y+10, x + 50, y + 50, fill='black', tags='piece')
+                    canvas.create_oval(x + 15, y + 15, x + 45, y + 45, fill='yellow', tags='piece')
+            else:
+                if board[row, col] == checkers.gameState.PLAYER_1:
+                    canvas.create_oval(x+10, y+10, x + 50, y + 50, fill='black', tags='piece')
+                elif board[row, col] == checkers.gameState.PLAYER_2:
+                    canvas.create_oval(x+10, y+10, x + 50, y + 50, fill='white', tags='piece')
+
+                elif board[row, col] == checkers.gameState.PLAYER_1_KING:
+                    canvas.create_oval(x+10, y+10, x + 50, y + 50, fill='black', tags='piece')
+                    canvas.create_oval(x + 15, y + 15, x + 45, y + 45, fill='yellow', tags='piece')
+                elif board[row, col] == checkers.gameState.PLAYER_2_KING:
+                    canvas.create_oval(x+10, y+10, x + 50, y + 50, fill='white', tags='piece')
+                    canvas.create_oval(x + 15, y + 15, x + 45, y + 45, fill='yellow', tags='piece')
             
             
 

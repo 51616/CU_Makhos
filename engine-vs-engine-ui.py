@@ -20,14 +20,17 @@ LOOP_ACTIVE = True
 
 # Argument parsers
 parser = argparse.ArgumentParser('Bot select')
-parser.add_argument('--player1', dest='player1', type=str)
-parser.add_argument('--player2', dest='player2', type=str)
+parser.add_argument('--player1', nargs='?', dest='player1', type=str)
+parser.add_argument('--player2', nargs='?', dest='player2', type=str)
+parser.add_argument('--mcts1', nargs='?', dest='mcts1', type=int, default=100)
+parser.add_argument('--mcts2', nargs='?', dest='mcts2', type=int, default=100)
+parser.add_argument('--depth', nargs='?', dest='depth', type=int, default=7)
 
 args = parser.parse_args()
 
 checkers = Game()
 board = checkers.getInitBoard()
-DEPTH = 7
+DEPTH = args.depth
 
 if args.player1 == 'minimax':
     AI_1 = minimaxAI(checkers,depth=DEPTH,verbose=True)
@@ -35,7 +38,7 @@ if args.player1 == 'minimax':
 else:
     nnet = nn(checkers, gpu_num=0)
     nnet.load_checkpoint(folder='models_minimax', filename='train_iter_268.pth.tar')
-    args1 = dotdict({'numMCTSSims':100, 'cpuct': 1.0})
+    args1 = dotdict({'numMCTSSims':args.mcts1, 'cpuct': 1.0})
     AI_1 = MCTS(checkers, nnet, args1, eval=True, verbose=True)
 
 if args.player2 == 'minimax':
@@ -44,7 +47,7 @@ if args.player2 == 'minimax':
 else:
     nnet2 = nn(checkers, gpu_num=0)
     nnet2.load_checkpoint(folder='models_minimax', filename='train_iter_268.pth.tar')
-    args2 = dotdict({'numMCTSSims':100, 'cpuct': 1.0})
+    args2 = dotdict({'numMCTSSims':args.mcts2, 'cpuct': 1.0})
     AI_2 = MCTS(checkers, nnet2, args2, eval=True, verbose=True) 
     
 
@@ -78,15 +81,15 @@ def draw_pieces(canvas, checkers):
             y = row * 60 
             
             if board[row, col] == checkers.gameState.PLAYER_1:
-                canvas.create_oval(x+10, y+10, x + 50, y + 50, fill='white', tags='piece')
-            elif board[row, col] == checkers.gameState.PLAYER_2:
                 canvas.create_oval(x+10, y+10, x + 50, y + 50, fill='black', tags='piece')
+            elif board[row, col] == checkers.gameState.PLAYER_2:
+                canvas.create_oval(x+10, y+10, x + 50, y + 50, fill='white', tags='piece')
 
             elif board[row, col] == checkers.gameState.PLAYER_1_KING:
-                canvas.create_oval(x+10, y+10, x + 50, y + 50, fill='white', tags='piece')
+                canvas.create_oval(x+10, y+10, x + 50, y + 50, fill='black', tags='piece')
                 canvas.create_oval(x + 15, y + 15, x + 45, y + 45, fill='yellow', tags='piece')
             elif board[row, col] == checkers.gameState.PLAYER_2_KING:
-                canvas.create_oval(x+10, y+10, x + 50, y + 50, fill='black', tags='piece')
+                canvas.create_oval(x+10, y+10, x + 50, y + 50, fill='white', tags='piece')
                 canvas.create_oval(x + 15, y + 15, x + 45, y + 45, fill='yellow', tags='piece')
 
 def draw_highlight(canvas, filtered_moves):
