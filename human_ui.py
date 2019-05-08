@@ -140,6 +140,7 @@ def move_ai(board_input):
         #print(index_to_move_human(np.argmax(valid_moves)))
         board, _ = checkers.getNextState(board_input, BOT_SELECT, np.argmax(valid_moves))
         board_history.append(copy.deepcopy(checkers))
+        display(board)
         return
     if args.type == 'minimax':
         action = AI.get_move(checkers.getCanonicalForm(board_input, state))
@@ -219,7 +220,7 @@ def forward():
 
 
 main_canvas.bind('<Button-1>', onclick)
-title = tk.Label(root, text='AlphaThCheckers', font=("Helvetica", 35))
+title = tk.Label(root, text='AlphaTHCheckers', font=("Helvetica", 35))
 title.pack()
 turn_label = tk.Label(root, text='', font=("Helvetica", 30))
 turn_label.pack()
@@ -248,8 +249,11 @@ while LOOP_ACTIVE:
     
 
     #print('state:',state)
-    if checkers.getGameEnded(board,-prev_state) != 0:
-        winner = checkers.getGameEnded(board,-prev_state)
+    if (state == PLAYER_SELECT_START) & (checkers.getGameEnded(board,1) != 0) or (checkers.getGameEnded(board,state) != 0):
+        if state == PLAYER_SELECT_START:
+            winner = checkers.getGameEnded(board,1)
+        else:
+            winner = checkers.getGameEnded(board,state)
         if winner==-1:
             turn_label['text'] = 'YOU LOST!'
         elif winner==1:
@@ -257,8 +261,10 @@ while LOOP_ACTIVE:
         else:
             turn_label['text'] = 'DRAW!'
         #print('Winner is:',winner)
-        continue
-    if state == PLAYER_SELECT_START:
+        #state = PLAYER_SELECT_START
+        #state = 10 #pause the game
+
+    elif state == PLAYER_SELECT_START:
         if (args.hint and prev_state == BOT_SELECT):
             hint(board)
         prev_state = PLAYER_SELECT_START
@@ -307,7 +313,7 @@ while LOOP_ACTIVE:
             end_point = None
             click_value = None
             update(main_canvas)
-    else:
+    elif state == BOT_SELECT:
         move_ai(board)
         move_num += 1
         update(main_canvas)
