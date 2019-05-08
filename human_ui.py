@@ -19,6 +19,8 @@ parser = argparse.ArgumentParser('Bot select')
 parser.add_argument('--type', '-t', dest='type', type=str)
 parser.add_argument('--player2', dest='player2', type=bool)
 parser.add_argument('--hint', dest='hint', type=bool)
+parser.add_argument('--depth', dest='depth', type=bool)
+parser.add_argument('--mcts', dest='mcts', type=bool)
 args = parser.parse_args()
 
 # Constants
@@ -37,14 +39,14 @@ board = checkers.getInitBoard()
 
 
 if args.type == 'minimax':
-    AI = minimaxAI(checkers, depth=7,verbose=True)
+    AI = minimaxAI(checkers, depth=args.depth,verbose=True)
     print("minimax")
 
 else:
     print('Neural network model')
     nnet = nn(checkers, gpu_num=0)
     nnet.load_checkpoint(folder='models_minimax', filename='train_iter_268.pth.tar')
-    args1 = dotdict({'numMCTSSims':200, 'cpuct': 1.0})
+    args1 = dotdict({'numMCTSSims':args.mcts, 'cpuct': 1.0})
     AI = MCTS(checkers, nnet, args1, eval=True, verbose=True)
     # def AI(x): return np.random.choice(
     #     32*32, p=mcts1.getActionProb(x, temp=0))
