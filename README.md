@@ -1,7 +1,5 @@
 # CU Makhos
 
-# Alpha Nagibator
-
 Implementation reinforcement learning for Thai Checkers based on the AlphaGo methods (supervised + reinforcement) since I failed to implement zero knowledge model in the first run (probably some hyperparameters issues since RL is prone to such thing).
 
 The implementation uses Python and Pytorch. It is based on [alpha-zero-general](https://github.com/suragnair/alpha-zero-general) framework so you can easily implement other variants of checkers.
