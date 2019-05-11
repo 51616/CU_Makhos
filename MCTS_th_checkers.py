@@ -59,7 +59,7 @@ class MCTS():
                     print('Win confidence for current board:' +  str( round( (0.5 + self.Qsa[(s,bestA)][0]/2)*100,2) ) + '%')
                 except:
                     pass
-                print((self.game.gameState.turn, self.game.gameState.stale))
+                #print((self.game.gameState.turn, self.game.gameState.stale))
             return probs
 
         counts = [x**(1./temp) for x in counts]

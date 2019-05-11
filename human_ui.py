@@ -16,11 +16,11 @@ from MCTS_th_checkers import MCTS
 
 # Argument parsers
 parser = argparse.ArgumentParser('Bot select')
-parser.add_argument('--type', '-t', dest='type', type=str)
-parser.add_argument('--player2', dest='player2', type=bool)
-parser.add_argument('--hint', dest='hint', type=bool)
-parser.add_argument('--depth', dest='depth', type=bool)
-parser.add_argument('--mcts', dest='mcts', type=bool)
+parser.add_argument('--type', '-t', nargs='?', dest='type', type=str)
+parser.add_argument('--player2', nargs='?', dest='player2', type=bool)
+parser.add_argument('--hint', nargs='?', dest='hint', type=bool, default=False)
+parser.add_argument('--depth', nargs='?', dest='depth', type=int, default = 5)
+parser.add_argument('--mcts', nargs='?', dest='mcts', type=int, default = 100)
 args = parser.parse_args()
 
 # Constants
@@ -50,6 +50,12 @@ else:
     AI = MCTS(checkers, nnet, args1, eval=True, verbose=True)
     # def AI(x): return np.random.choice(
     #     32*32, p=mcts1.getActionProb(x, temp=0))
+
+if args.hint:
+    nnet_hint = nn(checkers, gpu_num=0)
+    nnet_hint.load_checkpoint(folder='models_minimax', filename='train_iter_268.pth.tar')
+    args_hint = dotdict({'numMCTSSims':args.mcts, 'cpuct': 1.0})
+    AI_hint = MCTS(checkers, nnet_hint, args_hint, eval=True, verbose=True)
 
 display(board)
 
@@ -156,12 +162,14 @@ def move_ai(board_input):
 
 def hint(board_input):
     #action, pi, _, _ = AI.act(checkers.gameState, 0)
-    probs = AI.getActionProb((checkers.getCanonicalForm(board_input, PLAYER_SELECT_END)), temp=1)
+    probs = AI_hint.getActionProb((checkers.getCanonicalForm(board_input, PLAYER_SELECT_END)), temp=1)
     rec_moves = np.argsort(probs)[::-1][:5]
     print('Recommended moves:')
     for idx in rec_moves:
         if(probs[idx]>0):
-            print(index_to_move_human(idx), round(probs[idx],2))
+            move = index_to_move_human(idx)
+
+            print(''.join(np.array(move[0],dtype=str)) + ' to ' + ''.join(np.array(move[1],dtype=str)) + '  ' ,round(probs[idx],2))
 
     
 
@@ -220,7 +228,7 @@ def forward():
 
 
 main_canvas.bind('<Button-1>', onclick)
-title = tk.Label(root, text='AlphaTHCheckers', font=("Helvetica", 35))
+title = tk.Label(root, text='CU Checkers', font=("Helvetica", 35))
 title.pack()
 turn_label = tk.Label(root, text='', font=("Helvetica", 30))
 turn_label.pack()
