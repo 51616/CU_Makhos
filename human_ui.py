@@ -45,7 +45,7 @@ if args.type == 'minimax':
 else:
     print('Neural network model')
     nnet = nn(checkers, gpu_num=0)
-    nnet.load_checkpoint(folder='models_minimax', filename='train_iter_268.pth.tar')
+    nnet.load_checkpoint(folder='models', filename='train_iter_268.pth.tar')
     args1 = dotdict({'numMCTSSims':args.mcts, 'cpuct': 1.0})
     AI = MCTS(checkers, nnet, args1, eval=True, verbose=True)
     # def AI(x): return np.random.choice(
@@ -53,7 +53,7 @@ else:
 
 if args.hint:
     nnet_hint = nn(checkers, gpu_num=0)
-    nnet_hint.load_checkpoint(folder='models_minimax', filename='train_iter_268.pth.tar')
+    nnet_hint.load_checkpoint(folder='models', filename='train_iter_268.pth.tar')
     args_hint = dotdict({'numMCTSSims':args.mcts, 'cpuct': 1.0})
     AI_hint = MCTS(checkers, nnet_hint, args_hint, eval=True, verbose=True)
 
@@ -141,7 +141,7 @@ def move_ai(board_input):
     #global state
     global board
     valid_moves = checkers.getValidMoves(checkers.getCanonicalForm(board_input, state), 1)
-    if np.sum(valid_moves)==1:
+    if np.sum(valid_moves)==1 and args.type=='minimax':
         time.sleep(0.2)
         #print(index_to_move_human(np.argmax(valid_moves)))
         board, _ = checkers.getNextState(board_input, BOT_SELECT, np.argmax(valid_moves))
