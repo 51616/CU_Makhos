@@ -4,7 +4,7 @@ Implementation reinforcement learning for Thai Checkers based on the AlphaGo met
 
 The implementation uses Python and Pytorch. It is based on [alpha-zero-general](https://github.com/suragnair/alpha-zero-general) framework so you can easily implement other variants of checkers.
 
-If you plan to train your model or improve the bundled one look at `main_th_checkers.py`
+If you plan to train your model or improve the bundled one look at `main_th_checkers.py` (This is ad-hoc solution/implementation for my environment and hardware setup)
 
 ### How to play
 
